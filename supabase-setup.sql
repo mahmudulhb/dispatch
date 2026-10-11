@@ -19,6 +19,7 @@ create table if not exists public.snippets (
   updated_at  timestamptz not null default now()
 );
 
+create unique index if not exists snippets_id_lower_idx on public.snippets (lower(id));   -- ids are case-insensitive
 alter table public.snippets add column if not exists creator uuid default auth.uid();
 alter table public.snippets enable row level security;
 revoke all on public.snippets from anon, authenticated;
@@ -38,7 +39,7 @@ begin
   if (select count(*) from snippets where creator = auth.uid() and created_at > now() - interval '1 minute') >= 5 then
     raise exception 'rate limit' using errcode = 'RL001';
   end if;
-  insert into snippets (id, code, lang, owner_hash, creator) values (p_id, p_code, p_lang, p_hash, auth.uid())
+  insert into snippets (id, code, lang, owner_hash, creator) values (lower(p_id), p_code, p_lang, p_hash, auth.uid())
   returning created_at into t;                       -- duplicate id raises 23505; the app retries
   return t;
 end $$;
@@ -46,14 +47,14 @@ end $$;
 create or replace function public.get_snippet(p_id text)
 returns table (code text, lang text, created_at timestamptz, updated_at timestamptz)
 language sql stable security definer set search_path = public as $$
-  select code, lang, created_at, updated_at from snippets where id = p_id;
+  select code, lang, created_at, updated_at from snippets where lower(id) = lower(p_id);
 $$;
 
 create or replace function public.update_snippet(p_id text, p_hash text, p_code text, p_lang text)
 returns boolean language plpgsql security definer set search_path = public as $$
 begin
   update snippets set code = p_code, lang = p_lang, updated_at = now()
-  where id = p_id and owner_hash = p_hash;
+  where lower(id) = lower(p_id) and owner_hash = p_hash;
   return found;
 end $$;
 
