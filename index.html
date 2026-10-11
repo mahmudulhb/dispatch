@@ -276,7 +276,8 @@ function hlLines(src,lang){
 
 /* ---------- storage: Supabase (REST + RPC) ---------- */
 const cache={d7f3k9:SAMPLE};
-const keyOf=id=>{try{return localStorage.getItem('dispatch:key:'+id)}catch(e){return null}};
+const keyOf=id=>{try{const k='dispatch:key:'+id;let v=localStorage.getItem(k);if(v)return v;
+  for(let i=0;i<localStorage.length;i++){const n=localStorage.key(i);if(n&&n.toLowerCase()===k.toLowerCase())return localStorage.getItem(n)}}catch(e){}return null};
 const sha=async x=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(x)))].map(b=>b.toString(16).padStart(2,'0')).join('');
 async function rpc(fn,args,bearer){
   const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+(bearer||SUPABASE_ANON_KEY),'Content-Type':'application/json'},body:JSON.stringify(args)});
@@ -353,8 +354,8 @@ async function savePaste(id,p,isEdit){
   }catch(e){return {err:e.err||(e.code==='RL001'?'Too many snippets — wait a minute and try again':null)}}
   return null;
 }
-const ALPHA='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-const rid=()=>{let s='';while(s.length<6){for(const n of crypto.getRandomValues(new Uint8Array(12))){if(n<248&&s.length<6)s+=ALPHA[n%62]}}return s};
+const ALPHA='abcdefghijklmnopqrstuvwxyz0123456789';
+const rid=()=>{let s='';while(s.length<6){for(const n of crypto.getRandomValues(new Uint8Array(12))){if(n<252&&s.length<6)s+=ALPHA[n%36]}}return s};
 const validId=s=>/^[a-zA-Z0-9]{6}$/.test(s);
 const fmt=ts=>new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}).replace(/, (\d+:)/,' · $1');
 
@@ -567,7 +568,8 @@ let routed=null;
 async function route(h=location.hash.replace(/^#\/?/,'')||pathId()){
   if(h===routed)return;routed=h;
   const emb=h.startsWith('embed/');document.body.classList.toggle('embed',emb);
-  const id=emb?h.slice(6):h;
+  const id=(emb?h.slice(6):h).toLowerCase();
+  if(PATH_ROUTING&&LINK_BASE&&validId(id)){const want='/'+(emb?'embed/':'')+id;if(location.pathname!==want&&location.pathname.toLowerCase().replace(/\/$/,'')===want){try{history.replaceState(null,'',want+location.search)}catch(e){}}}
   if(id==='new'||id===''){editing=null;seed='';showEditor();return}
   if(!validId(id)){showMissing();return}
   const sid=id;showLoading();
