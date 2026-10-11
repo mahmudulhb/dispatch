@@ -575,8 +575,12 @@ async function route(h=location.hash.replace(/^#\/?/,'')||pathId()){
   if(p&&p.error){showMissing(true);return}
   p?showView(sid,p):showMissing();
 }
-function nav(h){route(h);try{location.hash=h}catch(e){}}
+function nav(h){
+  if(PATH_ROUTING&&LINK_BASE){try{history.pushState(null,'','/'+(h==='new'?'':h))}catch(e){}route(h)}
+  else{route(h);try{location.hash=h}catch(e){}}
+}
 addEventListener('hashchange',()=>route());
+addEventListener('popstate',()=>{routed=null;route()});
 
 /* ---------- theme ---------- */
 const root=document.documentElement;
