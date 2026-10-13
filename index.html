@@ -159,6 +159,25 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
 .sb:hover{color:var(--c,var(--accent));border-color:var(--c,var(--accent));transform:translateY(-2px)}
 .sb:active{transform:scale(.95)}
 .sb.off{color:var(--c);opacity:.45;pointer-events:none;cursor:default}
+.eln{color:inherit;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer;border-radius:3px}
+.eln:hover{background:rgba(239,68,68,.18)}
+.edit .gut .eg{color:#ef4444;font-weight:700;background:rgba(239,68,68,.14)}
+.row.eg{background:rgba(239,68,68,.1)}.row.eg .n{color:#ef4444;font-weight:700}
+.edit{position:relative}.edit textarea{position:relative;z-index:1}
+.hlay{position:absolute;left:77px;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;padding:0 28px 0 20px;font:inherit;line-height:30px;white-space:pre;color:transparent;z-index:0}
+.hlay mark{background:rgba(250,204,21,.38);color:transparent;border-radius:3px}.hlay mark.cur{background:rgba(249,115,22,.6)}
+.row.sm .c{background:rgba(250,204,21,.12)}
+::highlight(sm){background:rgba(250,204,21,.4)}
+::highlight(sc){background:rgba(249,115,22,.6)}
+.sbar{position:absolute;top:52px;right:18px;z-index:8;display:flex;align-items:center;gap:2px;padding:5px 6px;background:var(--bg);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.sbar[hidden]{display:none}
+.sbar input{width:190px;height:28px;border:0;outline:0;background:var(--sub);color:var(--text);border-radius:7px;padding:0 10px;font:400 13px 'JetBrains Mono',monospace}
+.sbar input:focus{box-shadow:0 0 0 1.5px var(--accent)}
+#scnt{min-width:62px;text-align:center;font:500 12px Inter,sans-serif;color:var(--muted);white-space:nowrap}
+.sb2{display:grid;place-items:center;min-width:28px;height:28px;border:0;border-radius:7px;background:none;color:var(--text2);font:600 12px Inter,sans-serif;cursor:pointer;transition:background .2s,color .2s}
+.sb2:hover{background:var(--sub);color:var(--text)}.sb2.on{background:var(--accent);color:#fff}
+@media(max-width:900px){.hlay{left:45px;padding-left:12px;padding-right:14px}}
+@media(max-width:600px){.sbar{left:8px;right:8px}.sbar input{flex:1;width:auto;min-width:0}}
 </style>
 </head>
 <body>
@@ -172,6 +191,7 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
 
 <main>
   <section class="code" id="codeBox">
+    <div class="sbar" id="sbar" hidden><input id="sq" type="text" placeholder="Find in code" spellcheck="false" autocomplete="off" aria-label="Find in code"><span id="scnt"></span><button class="sb2" data-s="cs" title="Match case" aria-label="Match case">Aa</button><button class="sb2" data-s="prev" title="Previous (Shift+Enter)" aria-label="Previous match"><i data-lucide="chevron-up" width="15"></i></button><button class="sb2" data-s="next" title="Next (Enter)" aria-label="Next match"><i data-lucide="chevron-down" width="15"></i></button><button class="sb2" data-s="x" title="Close (Esc)" aria-label="Close search"><i data-lucide="x" width="15"></i></button></div>
     <div class="tools" id="tools"></div>
     <div class="ed" id="ed"></div>
     <div class="out" id="out" hidden>
@@ -424,11 +444,12 @@ function toggleFull(){vt(()=>{const f=box.classList.toggle('full');const b=$('ex
 const FULL='<div class="sep"></div><button class="tbtn sq" id="expand" data-act="full" aria-label="Toggle fullscreen" title="Fullscreen (F)"><i data-lucide="'+'maximize-2" width="15"></i></button>';
 function setTools(kind){closeOut();
   tools.style.display=kind==='none'?'none':'';
-  tools.innerHTML=kind==='view'?RUNBTN+(cur&&owns(cur.id)?'<button class="tbtn" data-act="edit" title="Edit snippet (E)"><i data-lucide="pencil" width="15"></i><span>Edit</span></button>':'')+'<button class="tbtn" data-act="copy" title="Copy code (C)"><i data-lucide="copy" width="15"></i><span>Copy</span></button><button class="tbtn" data-act="share" title="Share (S)"><i data-lucide="share-2" width="15"></i><span>Share</span></button><button class="tbtn" data-act="dl" title="Download (D)"><i data-lucide="download" width="15"></i><span>Download</span></button>'+FULL
+  tools.innerHTML=kind==='view'?RUNBTN+(cur&&owns(cur.id)?'<button class="tbtn" data-act="edit" title="Edit snippet (E)"><i data-lucide="pencil" width="15"></i><span>Edit</span></button>':'')+'<button class="tbtn" data-act="fork" title="Fork: edit a copy as a new snippet (K)"><i data-lucide="git-fork" width="15"></i><span>Fork</span></button><button class="tbtn" data-act="copy" title="Copy code (C)"><i data-lucide="copy" width="15"></i><span>Copy</span></button><button class="tbtn" data-act="share" title="Share (S)"><i data-lucide="share-2" width="15"></i><span>Share</span></button><button class="tbtn" data-act="dl" title="Download (D)"><i data-lucide="download" width="15"></i><span>Download</span></button>'+FULL
     :kind==='edit'?RUNBTN+(editing?'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="check" width="15"></i><span>Save changes</span></button><button class="tbtn" data-act="cancel"><i data-lucide="x" width="15"></i><span>Cancel</span></button>':'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="send" width="15"></i><span>Publish</span></button><button class="tbtn" data-act="clear"><i data-lucide="eraser" width="15"></i><span>Clear</span></button>')+FULL:'';
   icons();
 }
 function side(id,p){
+  if(p&&p.lang==='Python'&&$('ta'))warmPy();
   $('link').textContent=id?linkFor(id):'Publish to get a link';
   $('embed').textContent=id?`<iframe src="${embedFor(id)}" width="100%" height="360" frameborder="0"></iframe>`:'Publish to get embed code';
   document.querySelectorAll('[data-copy]').forEach(b=>b.disabled=!id);
@@ -439,7 +460,7 @@ function side(id,p){
 }
 
 /* ---------- views ---------- */
-let cur=null,seed='',editing=null;
+let cur=null,seed='',editing=null,forkSeed='';
 const owns=id=>!!keyOf(id);
 function showLoading(){ed._fit=null;setTools('none');ed.innerHTML='<div class="miss"><i data-lucide="loader-2" class="spin" width="28"></i></div>';icons()}
 function showMissing(net){
@@ -447,12 +468,12 @@ function showMissing(net){
   ed.innerHTML=net?'<div class="miss"><i data-lucide="wifi-off" width="36"></i><h3>Couldn\'t load this snippet</h3><p>Check your connection and reload the page.</p></div>':'<div class="miss"><i data-lucide="file-x" width="36"></i><h3>Paste not found</h3><p>This link may be wrong, or the snippet no longer exists.</p></div>';icons();
 }
 function showView(id,p){
-  cur={id,...p};ed._fit=null;setTools('view');side(id,p);
+  srClose(false);cur={id,...p};ed._fit=null;setTools('view');side(id,p);
   const H=hlLines(p.code,p.lang);
   ed.innerHTML=H.map((h,i)=>`<div class="row" style="animation-delay:${.15+Math.min(i,40)*.05}s"><span class="n">${i+1}</span><span class="c">${h||' '}${i===H.length-1?'<i class="caret"></i>':''}</span></div>`).join('');
 }
 function showEditor(){
-  cur=null;setTools('edit');side(editing?editing.id:null,editing?{lang:detect(seed),ts:editing.ts}:null);
+  srClose(false);cur=null;setTools('edit');side(editing?editing.id:null,editing?{lang:detect(seed),ts:editing.ts}:null);
   ed.innerHTML='<div class="edit"><div class="n gut" id="gut"></div><textarea id="ta" spellcheck="false" wrap="soft" placeholder="Paste or type your code here…" aria-label="Code"></textarea></div>';
   const ta=$('ta'),gut=$('gut');let t;
   const mir=document.createElement('div');mir.className='mirror';ta.parentNode.appendChild(mir);
@@ -503,6 +524,7 @@ tools.addEventListener('click',async e=>{
   else if(a==='full')toggleFull();
   else if(a==='edit'&&cur){editing={id:cur.id,ts:cur.ts};seed=cur.code;showEditor()}
   else if(a==='cancel'&&editing){const id=editing.id;editing=null;showView(id,cache[id])}
+  else if(a==='fork'&&cur){forkSeed=cur.code;nav('new');toast('Forked. Edit it, then publish as a new snippet')}
   else if(a==='run')runCode();
   else if(a==='share')openShare();
   else if(a==='pub')publish();
@@ -511,7 +533,7 @@ tools.addEventListener('click',async e=>{
 document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{if(b.disabled)return;await copy($(b.dataset.copy).textContent);flash(b);toast('Copied to clipboard')});
 $('newBtn').onclick=()=>{box.classList.remove('full');if(!cur&&$('ta')){editing=null;seed='';showEditor();return}editing=null;nav('new')};
 const MOD=/Mac|iPhone|iPad/.test(navigator.userAgent)?'⌘':'Ctrl';
-const SC=[['N','Create new snippet'],['C','Copy code'],['L','Copy link'],['D','Download'],['R','Run code (30+ languages)'],['F9','Run code, even while typing'],['Mod + Shift + Enter','Run code, even while typing'],['S','Share snippet'],['E','Edit your snippet'],['F','Fullscreen'],['T','Switch light / dark'],['Mod + Enter','Publish / save changes'],['Mod + S','Publish / save changes'],['Esc','Close / exit fullscreen'],['?','Show this list']];
+const SC=[['N','Create new snippet'],['C','Copy code'],['L','Copy link'],['D','Download'],['R','Run code (30+ languages)'],['F9','Run code, even while typing'],['Mod + Shift + Enter','Run code, even while typing'],['S','Share snippet'],['Mod + Shift + F','Find in code'],['Alt + Shift + F','Format code (while typing too)'],['K','Fork snippet (edit a copy)'],['E','Edit your snippet'],['F','Fullscreen'],['T','Switch light / dark'],['Mod + Enter','Publish / save changes'],['Mod + S','Publish / save changes'],['Esc','Close / exit fullscreen'],['?','Show this list']];
 function toggleHelp(){
   const ex=document.querySelector('.kbwrap');if(ex){ex.remove();return}
   const w=document.createElement('div');w.className='kbwrap';
@@ -533,6 +555,8 @@ document.addEventListener('keydown',e=>{
   }
   if(cx)return;
   const mod=e.metaKey||e.ctrlKey;
+  if(mod&&e.shiftKey&&!e.altKey&&e.code==='KeyF'){e.preventDefault();openSearch();return}
+  if(e.altKey&&e.shiftKey&&e.code==='KeyF'){e.preventDefault();formatNow();return}
   if(e.key==='F9'||(mod&&e.shiftKey&&e.key==='Enter')){e.preventDefault();if($('lsel'))runCode();return}
   if(mod&&!e.altKey&&e.key.toLowerCase()==='s'){if($('ta')){e.preventDefault();publish()}return}
   if(mod||e.altKey||isTyping(e.target))return;
@@ -545,6 +569,7 @@ document.addEventListener('keydown',e=>{
   else if(k==='r')press('[data-act=run]');
   else if(k==='s')press('[data-act=share]');
   else if(k==='e')press('[data-act=edit]');
+  else if(k==='k')press('[data-act=fork]');
   else if(k==='f')press('[data-act=full]');
   else if(k==='l')press('[data-copy=link]');
   else if(k==='t'){const n=root.dataset.theme==='dark'?'light':'dark';setTheme(n,{currentTarget:$(n)})}
@@ -567,6 +592,147 @@ function openShare(){
   w.querySelector('#shcp').onclick=async e=>{const b=e.currentTarget;await copy(linkFor(cur.id));flash(b);toast('Link copied')};
 }
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-native]');if(!b||!cur)return;try{await navigator.share({title:'Dispatch',text:'Check out this '+cur.lang+' snippet',url:linkFor(cur.id)})}catch(_){}});
+/* ---------- format ---------- */
+const PV='https://cdn.jsdelivr.net/npm/prettier@3.3.3/';
+const PL={JavaScript:['babel','estree'],TypeScript:['typescript','estree'],CSS:['postcss'],HTML:['html','babel','estree','postcss'],JSON:['babel','estree'],Markdown:['markdown']};
+const PP={JavaScript:'babel',TypeScript:'typescript',CSS:'css',HTML:'html',JSON:'json',Markdown:'markdown'};
+const BR=['C','C++','C#','Java','Go','Rust','Kotlin','Swift','PHP','Scala','Groovy','D','Objective-C'];
+const loaded={};
+const loadJS=u=>new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=u;sc.onload=ok;sc.onerror=()=>no(new Error("Couldn't load the formatter (offline?)"));document.head.appendChild(sc)});
+async function prettierFmt(code,lang){
+  if(!window.prettier)await loadJS(PV+'standalone.js');
+  for(const n of PL[lang])if(!loaded[n]){await loadJS(PV+'plugins/'+n+'.js');loaded[n]=1}
+  return prettier.format(code,{parser:PP[lang],plugins:Object.values(prettierPlugins),tabWidth:4,printWidth:100});
+}
+function wsFmt(code){return code.replace(/\r\n?/g,'\n').split('\n').map(l=>l.replace(/^\t+/,m=>'    '.repeat(m.length)).replace(/\s+$/,'')).join('\n').replace(/\n{3,}/g,'\n\n').replace(/\s+$/,'')+'\n'}
+function braceFmt(code,lang){
+  const pp=lang==='C'||lang==='C++'||lang==='Objective-C';
+  let depth=0,blk=false,blank=false;const co={},out=[];
+  for(const raw of code.replace(/\r\n?/g,'\n').split('\n')){
+    const t=raw.trim();
+    if(!t){if(!blank&&out.length)out.push('');blank=true;continue}
+    blank=false;
+    if(blk){out.push('    '.repeat(depth)+(t[0]==='*'?' ':'')+t);if(t.includes('*/'))blk=false;continue}
+    if(pp&&t[0]==='#'){out.push(t);continue}
+    let o=0,c=0,lead=0,cnt=true,q=null;
+    for(let i=0;i<t.length;i++){
+      const ch=t[i],nx=t[i+1];
+      if(q){if(ch==='\\')i++;else if(ch===q)q=null;continue}
+      if(ch==='/'&&nx==='/')break;
+      if(ch==='/'&&nx==='*'){const e=t.indexOf('*/',i+2);if(e<0){blk=true;break}i=e+1;continue}
+      if(ch==='"'||ch==='`'){q=ch;cnt=false;continue}
+      if(ch==="'"){const m=t.slice(i).match(/^'(\\.|[^'\\])'/);if(m)i+=m[0].length-1;cnt=false;continue}
+      if('{(['.includes(ch)){o++;cnt=false}
+      else if('})]'.includes(ch)){c++;if(cnt)lead++}
+      else if(!/\s/.test(ch))cnt=false;
+    }
+    const d=Math.max(0,depth-lead);
+    for(let k=depth;k>d;k--)delete co[k];
+    let ind;
+    if(/^(public|private|protected)\s*:/.test(t)&&depth>0)ind=depth-1;
+    else if(/^(case\s.+:|default\s*:)/.test(t)){ind=d;co[d]=true}
+    else ind=d+(co[d]?1:0);
+    out.push('    '.repeat(ind)+t);
+    depth=Math.max(0,depth+o-c);
+  }
+  while(out.length&&out[out.length-1]==='')out.pop();
+  return out.join('\n')+'\n';
+}
+async function formatNow(){
+  const ta=$('ta');if(!ta)return toast('Open the editor (Edit or Fork) to format');
+  const code=ta.value;if(!code.trim())return;
+  const sv=$('lsel')&&$('lsel').value,lang=sv&&sv!=='auto'?sv:detect(code),pos=ta.selectionStart,n=code.length;
+  try{
+    const out=PP[lang]?await prettierFmt(code,lang):BR.includes(lang)?braceFmt(code,lang):wsFmt(code);
+    if(out===code)return toast('Already formatted');
+    ta.focus();ta.select();
+    if(!document.execCommand('insertText',false,out)){ta.value=out;ta.dispatchEvent(new Event('input'))}
+    const np=Math.min(out.length,Math.round(pos/n*out.length));ta.setSelectionRange(np,np);
+    toast(PP[lang]||BR.includes(lang)?'Formatted':'Whitespace cleaned (no full formatter for '+lang+')');
+  }catch(e){toast("Can't format: "+String(e.message||e).split('\n')[0].slice(0,80))}
+}
+/* ---------- error lines + find ---------- */
+const ERX=[[/([\w.\/-]+\.\w{1,6}):(\d+)(?::\d+)?/,2],[/[\w.\/-]+\.cs\((\d+),\d+\)/,1],[/File "([^"\/]+)", line (\d+)/,2],[/\bline (\d+)/i,1]];
+function linkErrs(text,max){
+  return text.split('\n').map(l=>{
+    for(const [rx,g] of ERX){const m=rx.exec(l);if(!m)continue;
+      if(rx===ERX[0][0]&&(/(^|\/)(usr|lib|opt)\//.test(m[1])||/\.(h|hpp|hh|hxx|tcc)$/i.test(m[1])))continue;
+      const n=+m[g];if(n>=1&&n<=max){const a=m.index;return esc(l.slice(0,a))+`<span class="eln" role="button" tabindex="0" data-ln="${n}" title="Go to line ${n}">`+esc(m[0])+'</span>'+esc(l.slice(a+m[0].length))}}
+    return esc(l)}).join('\n');
+}
+const clearErr=()=>document.querySelectorAll('.eg').forEach(x=>x.classList.remove('eg'));
+const lineEl=L=>{const g=$('gut');return g?g.children[L]:ed.children[L]};
+function scrollToLine(L){const el=lineEl(L);if(!el)return;const r=el.getBoundingClientRect(),er=ed.getBoundingClientRect();ed.scrollTop+=r.top-er.top-ed.clientHeight/2+15}
+function goLine(n){
+  const L=n-1,ta=$('ta'),el=lineEl(L);if(!el)return;
+  clearErr();el.classList.add('eg');scrollToLine(L);
+  if(ta){const ls=ta.value.split('\n');let a=0;for(let i=0;i<L;i++)a+=ls[i].length+1;ta.focus({preventScroll:true});ta.setSelectionRange(a,a+(ls[L]||'').length)}
+}
+const SR={on:false,cs:false,q:'',m:[],i:-1};
+const srText=()=>{const t=$('ta');return t?t.value:(cur?cur.code:'')};
+function srLayer(){
+  const ta=$('ta');if(!ta||$('hlay'))return;
+  const d=document.createElement('div');d.id='hlay';d.className='hlay';d.innerHTML='<div></div>';ta.parentNode.appendChild(d);
+  ta.addEventListener('scroll',()=>{d.firstChild.style.transform='translateX('+-ta.scrollLeft+'px)'});
+  ta.addEventListener('input',()=>{if(SR.on)srFind(true)});
+}
+function rngIn(el,off,len){
+  const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),r=document.createRange();let n,pos=0,st=false;
+  while(n=w.nextNode()){const l=n.length;
+    if(!st&&off<pos+l){r.setStart(n,off-pos);st=true}
+    if(st&&off+len<=pos+l){r.setEnd(n,off+len-pos);return r}
+    pos+=l}
+  return null;
+}
+function srPaint(){
+  const ta=$('ta'),hl=window.CSS&&CSS.highlights&&window.Highlight;
+  if(ta){
+    const d=$('hlay');if(!d)return;
+    const ls=ta.value.split('\n'),by={};SR.m.forEach((m,k)=>(by[m.l]=by[m.l]||[]).push([m.c,k]));
+    d.firstChild.innerHTML=ls.map((l,li)=>{let o='',p=0;for(const [c,k] of by[li]||[]){o+=esc(l.slice(p,c))+`<mark${k===SR.i?' class="cur"':''}>`+esc(l.slice(c,c+SR.q.length))+'</mark>';p=c+SR.q.length}return o+esc(l.slice(p))||' '}).join('\n');
+    d.firstChild.style.transform='translateX('+-ta.scrollLeft+'px)';
+    return;
+  }
+  const rows=[...ed.children];rows.forEach(r=>r.classList.remove('sm'));
+  if(hl){
+    const all=[],cu=[];
+    SR.m.forEach((m,k)=>{const c=rows[m.l]&&rows[m.l].querySelector('.c');const r=c&&rngIn(c,m.c,SR.q.length);if(r)(k===SR.i?cu:all).push(r)});
+    CSS.highlights.set('sm',new Highlight(...all));CSS.highlights.set('sc',new Highlight(...cu));
+  }else SR.m.forEach(m=>rows[m.l]&&rows[m.l].classList.add('sm'));
+}
+function srCount(){$('scnt').textContent=SR.m.length?(SR.i+1)+' / '+SR.m.length:(SR.q?'No results':'')}
+function srFind(keep){
+  const q=$('sq').value;SR.q=q;SR.m=[];
+  if(q){const nq=SR.cs?q:q.toLowerCase();srText().split('\n').forEach((l,li)=>{const h=SR.cs?l:l.toLowerCase();for(let p=h.indexOf(nq);p>=0;p=h.indexOf(nq,p+nq.length))SR.m.push({l:li,c:p})})}
+  SR.i=SR.m.length?(keep?Math.min(Math.max(SR.i,0),SR.m.length-1):0):-1;
+  srPaint();srCount();
+  if(!keep&&SR.i>=0)scrollToLine(SR.m[SR.i].l);
+}
+function srStep(d){if(!SR.m.length)return;SR.i=(SR.i+d+SR.m.length)%SR.m.length;srPaint();srCount();scrollToLine(SR.m[SR.i].l)}
+function openSearch(){
+  const ta=$('ta');if(!ta&&!cur)return;
+  SR.on=true;$('sbar').hidden=false;srLayer();
+  const sel=ta&&ta.selectionEnd>ta.selectionStart?ta.value.slice(ta.selectionStart,ta.selectionEnd):String(getSelection());
+  if(sel&&!/\n/.test(sel)&&sel.length<100)$('sq').value=sel;
+  $('sq').focus();$('sq').select();srFind(false);
+}
+function srClose(refocus){
+  if(!SR.on)return;SR.on=false;$('sbar').hidden=true;SR.m=[];SR.i=-1;
+  const d=$('hlay');if(d)d.firstChild.innerHTML='';
+  if(window.CSS&&CSS.highlights){CSS.highlights.delete('sm');CSS.highlights.delete('sc')}
+  [...ed.children].forEach(r=>r.classList&&r.classList.remove('sm'));
+  const ta=$('ta');if(refocus&&ta)ta.focus();
+}
+$('sq').addEventListener('input',()=>srFind(false));
+$('sq').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();srStep(e.shiftKey?-1:1)}
+  else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();srClose(true)}
+});
+$('sbar').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;const a=b.dataset.s;
+  if(a==='next')srStep(1);else if(a==='prev')srStep(-1);else if(a==='x')srClose(true);
+  else if(a==='cs'){SR.cs=!SR.cs;b.classList.toggle('on',SR.cs);srFind(false)}});
+$('obody').addEventListener('click',e=>{const a=e.target.closest('.eln');if(a)goLine(+a.dataset.ln)});
+$('obody').addEventListener('keydown',e=>{const a=e.target.closest&&e.target.closest('.eln');if(a&&e.key==='Enter')goLine(+a.dataset.ln)});
 /* ---------- run code (JavaScript in a Worker, HTML in a sandboxed iframe) ---------- */
 const J0='https://ce.judge0.com';
 const LID={'C':50,'C++':54,'C#':51,Java:62,Python:71,Go:60,Rust:73,PHP:68,TypeScript:74,Shell:46,SQL:82,Kotlin:78,Swift:83,Ruby:72,Lua:64,Perl:85,R:80,Haskell:61,Scala:81,Elixir:57,Erlang:58,Pascal:67,Fortran:59,OCaml:65,Prolog:69,Groovy:88,Clojure:86,Lisp:55,D:56,'F#':87,'Objective-C':79,Octave:66,'VB.NET':84,COBOL:77,Basic:47,Assembly:45};
@@ -589,11 +755,18 @@ async function runWandbox(code,lang,add,stat,sg){
 }
 /* Python runs in the browser (Pyodide in a Worker): no server, no rate limit. Falls back to the server runners if it can't start. */
 const PYSRC=`importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');
-let py;onmessage=async e=>{try{if(!py){py=await loadPyodide();postMessage({t:'ready'})}
+let py,pyP;onmessage=async e=>{try{if(!py){py=await(pyP=pyP||loadPyodide());postMessage({t:'ready'})}
+if(e.data.warm)return;
 const L=e.data.stdin.split('\\n');let i=0;
 py.setStdout({batched:s=>postMessage({t:'log',a:s})});py.setStderr({batched:s=>postMessage({t:'error',a:s})});py.setStdin({stdin:()=>i<L.length?L[i++]:undefined});
 await py.loadPackagesFromImports(e.data.code);await py.runPythonAsync(e.data.code)}catch(err){postMessage({t:'error',a:String(err.message||err)})}postMessage({t:'done'})}`;
 let pw=null,pt=null,pyReady=false,pyBusy=false;
+function warmPy(){
+  if(pw)return;
+  try{pw=new Worker(URL.createObjectURL(new Blob([PYSRC],{type:'text/javascript'})));
+    pw.onmessage=e=>{if(e.data.t==='ready')pyReady=true};pw.onerror=()=>{if(pw){pw.terminate();pw=null}pyReady=false};
+    pw.postMessage({warm:1,code:'',stdin:''})}catch(e){pw=null}
+}
 function runPy(code,add,stat){
   let fin=false;
   const fb=()=>{if(fin)return;fin=true;pyBusy=false;clearTimeout(pt);if(pw){pw.terminate();pw=null}pyReady=false;stat.textContent='Switching to server…';runRemote(code,'Python',add,stat)};
@@ -609,20 +782,29 @@ function runPy(code,add,stat){
   pt=setTimeout(()=>{if(fin)return;fin=true;pyBusy=false;if(pw){pw.terminate();pw=null}pyReady=false;add('error','Stopped: ran for more than 20 seconds');stat.textContent='Stopped'},20000);
   w.postMessage({code,stdin:$('stdin').value||''});
 }
-let rc=null,asked='';
+let rc=null,asked='',J0W=true;
+const pref=()=>{try{return localStorage.getItem('dp_runner')}catch(e){return null}},setPref=v=>{try{localStorage.setItem('dp_runner',v)}catch(e){}};
 async function runRemote(code,lang,add,stat){
   const id=LID[lang];rc=new AbortController();const sg=rc.signal;
+  const t0=Date.now(),tick=setInterval(()=>{const x=stat.textContent;if(x.startsWith('Running'))stat.textContent=x.replace(/ · \d+s$/,'')+' · '+((Date.now()-t0)/1000|0)+'s'},500);
+  const stop=()=>clearInterval(tick);
+  if(pref()==='w'&&WB[lang]){try{await runWandbox(code,lang,add,stat,sg);stop();rc=null;return}catch(e0){if(sg.aborted){stop();return}setPref('j')}}
   stat.textContent='Running on Judge0…';
   if(lang==='Java'&&/public\s+class\s+(?!Main\b)\w+/.test(code))add('sys','Tip: this runner needs the public class to be named Main');
   try{
-    const r=await fetch(J0+'/submissions?base64_encoded=true&wait=false',{method:'POST',signal:sg,headers:{'Content-Type':'application/json'},body:JSON.stringify({source_code:enc(code),language_id:id,stdin:enc($('stdin').value||'')})});
+    const body=JSON.stringify({source_code:enc(code),language_id:id,stdin:enc($('stdin').value||'')}),post=w=>fetch(J0+'/submissions?base64_encoded=true&fields=*&wait='+w,{method:'POST',signal:sg,headers:{'Content-Type':'application/json'},body});
+    let r=await post(J0W?'true':'false');
     if(r.status===429)throw new Error('Free runner is busy (rate limit) — wait a few seconds and run again');
-    const j=await r.json();if(!j.token)throw new Error(j.message||j.error||'Runner rejected the request');
-    let d;
-    for(let i=0;i<45;i++){
-      await new Promise(f=>setTimeout(f,i<3?500:1000));
-      d=await (await fetch(J0+'/submissions/'+j.token+'?base64_encoded=true&fields=*',{signal:sg})).json();
-      if(d.status&&d.status.id>2)break;
+    let j=await r.json(),d=null;
+    if(j&&j.status&&j.status.id>2)d=j;
+    else if(!j||!j.token){
+      if(J0W){J0W=false;r=await post('false');if(r.status===429)throw new Error('Free runner is busy (rate limit) — wait a few seconds and run again');j=await r.json()}
+      if(!j||!j.token)throw new Error((j&&(j.message||j.error))||'Runner rejected the request');
+    }
+    for(let i=0;!d&&i<70;i++){
+      await new Promise(f=>setTimeout(f,i<4?300:i<10?600:1000));
+      const q=await (await fetch(J0+'/submissions/'+j.token+'?base64_encoded=true&fields=*',{signal:sg})).json();
+      if(q.status&&q.status.id>2)d=q;
     }
     if(!d||!d.status||d.status.id<=2)throw new Error('Runner took too long — try again');
     const o=dec(d.stdout),e=dec(d.stderr),c=dec(d.compile_output),m=dec(d.message);
@@ -630,8 +812,8 @@ async function runRemote(code,lang,add,stat){
     if(!(o||e||c||m))add('sys','(no output)');
     stat.textContent=(d.status.id===5?'Stopped':d.status.description)+(d.time?' · '+Math.round(d.time*1000)+' ms':'')+(d.memory?' · '+(d.memory/1024).toFixed(1)+' MB':'');
   }catch(err){if(sg.aborted)return;
-    if(WB[lang]){try{await runWandbox(code,lang,add,stat,sg);rc=null;return}catch(e2){if(sg.aborted)return}}
-    stat.textContent='Failed';add('error',err.name==='TypeError'?'Could not reach the free runner — check your connection':err.message)}
+    if(WB[lang]){try{await runWandbox(code,lang,add,stat,sg);setPref('w');rc=null;return}catch(e2){if(sg.aborted)return}}
+    stat.textContent='Failed';add('error',err.name==='TypeError'?'Could not reach the free runner — check your connection':err.message)}finally{stop()}
   rc=null;
 }
 const RUNBTN='<span class="rungrp" style="display:none"><select class="lsel" id="lsel" aria-label="Run as language" title="Run as"><option value="auto">Auto</option>'+RUNNABLE.slice().sort().map(l=>`<option>${l}</option>`).join('')+'</select><button class="tbtn" data-act="run" title="Run (R)"><i data-lucide="play" width="15"></i><span>Run</span></button></span>';
@@ -670,17 +852,18 @@ function runCode(){
     $('ostat').textContent='Waiting for input';$('stdin').focus();return;
   }
   stopRun();
-  const body=$('obody'),stat=$('ostat');$('out').hidden=false;body.className='obody';body.innerHTML='';
+  const body=$('obody'),stat=$('ostat');$('out').hidden=false;body.className='obody';body.innerHTML='';clearErr();
   if(lang==='HTML'){
     body.classList.add('pv');
     const f=document.createElement('iframe');f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups');f.title='Preview';f.srcdoc=code;body.appendChild(f);
     stat.textContent='HTML preview · sandboxed';return;
   }
+  const nl=code.split('\n').length;
   let n=0,chars=0,capped=false;
   const add=(cls,txt)=>{
     if(capped)return;n++;chars+=txt.length;
     if(n>500||chars>100000){capped=true;cls='sys';txt='… output truncated'}
-    const d=document.createElement('div');d.className='ol '+cls;d.textContent=txt;body.appendChild(d);body.scrollTop=body.scrollHeight;
+    const d=document.createElement('div');d.className='ol '+cls;if(cls==='error')d.innerHTML=linkErrs(txt,nl);else d.textContent=txt;body.appendChild(d);body.scrollTop=body.scrollHeight;
   };
   stat.textContent='Running…';
   if(lang==='Python'){runPy(code,add,stat);return}
@@ -715,19 +898,20 @@ async function route(h=location.hash.replace(/^#\/?/,'')||pathId()){
   const emb=h.startsWith('embed/');document.body.classList.toggle('embed',emb);
   const id=(emb?h.slice(6):h).toLowerCase();
   if(PATH_ROUTING&&LINK_BASE&&validId(id)){const want='/'+(emb?'embed/':'')+id;if(location.pathname!==want&&location.pathname.toLowerCase().replace(/\/$/,'')===want){try{history.replaceState(null,'',want+location.search)}catch(e){}}}
-  if(id==='new'||id===''){editing=null;seed='';showEditor();return}
+  if(id==='new'||id===''){editing=null;seed=forkSeed;forkSeed='';showEditor();return}
   if(!validId(id)){showMissing();return}
   const sid=id;showLoading();
   const p=await fetchPaste(sid);if(routed!==h)return;
   if(p&&p.error){showMissing(true);return}
   p?showView(sid,p):showMissing();
 }
+let lastNav=0;
 function nav(h){
   if(PATH_ROUTING&&LINK_BASE){try{history.pushState(null,'','/'+(h==='new'?'':h))}catch(e){}route(h)}
-  else{route(h);try{location.hash=h}catch(e){}}
+  else{route(h);lastNav=Date.now();try{location.hash=h}catch(e){}}
 }
 addEventListener('hashchange',()=>route());
-addEventListener('popstate',()=>{routed=null;route()});
+addEventListener('popstate',()=>{if(Date.now()-lastNav<150)return;routed=null;route()});
 
 /* ---------- theme ---------- */
 const root=document.documentElement;
