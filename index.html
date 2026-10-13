@@ -138,6 +138,27 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
 .ol{color:var(--pl)}.ol.error{color:#ef4444}.ol.warn{color:#d97706}.ol.result{color:var(--accent)}.ol.sys{color:var(--muted);font-style:italic}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 @media(max-width:900px){.ed{background:linear-gradient(90deg,var(--sub) 44px,var(--border) 44px,var(--border) 45px,transparent 45px)}.row,.edit{grid-template-columns:45px minmax(0,1fr)}.mirror{left:45px}.c,.edit textarea,.mirror{padding-left:12px;padding-right:14px}header{padding:0 16px}.create span{display:none}.create{padding:0 14px}main{grid-template-columns:1fr}.code{border-right:0;border-bottom:1px solid var(--border);height:64vh}.tbtn span{display:none}.tbtn{width:34px;padding:0;justify-content:center}.ed{font-size:13.5px}}
+.rungrp{display:inline-flex;align-items:center;gap:6px}
+.lsel{height:34px;max-width:130px;border:1px solid var(--border);background:var(--bg);color:var(--text2);border-radius:8px;padding:0 8px;font:500 13px Inter,sans-serif;cursor:pointer}
+.lsel:hover{border-color:var(--accent)}
+.out{position:relative}
+.rz{position:absolute;top:-4px;left:0;right:0;height:9px;cursor:ns-resize;z-index:3;touch-action:none}
+.rz::after{content:"";position:absolute;left:50%;top:3px;width:36px;height:3px;margin-left:-18px;border-radius:3px;background:var(--border);transition:background .2s}
+.rz:hover::after{background:var(--accent)}
+.out.max{position:absolute;inset:0;height:auto!important;z-index:5;border:0}
+.split{flex:1;min-height:0;display:flex}
+.sti{flex:none;width:36%;min-width:0;display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-right:1px solid var(--border)}
+.sti label{font:600 11px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.sti textarea{flex:1;min-height:0;width:100%;resize:none;font:400 13px/1.5 'JetBrains Mono',monospace;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 10px;outline:0}
+.sti textarea:focus{border-color:var(--accent)}
+.split .obody{flex:1;min-width:0}
+@media(max-width:900px){.split{flex-direction:column}.sti{width:auto;height:96px;border-right:0;border-bottom:1px solid var(--border)}}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.qs{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.sb{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border:1px solid var(--border);border-radius:12px;background:var(--sub);color:var(--text2);font-size:12.5px;font-weight:500;text-decoration:none;cursor:pointer;transition:transform .2s var(--ease),color .2s,border-color .2s}
+.sb:hover{color:var(--c,var(--accent));border-color:var(--c,var(--accent));transform:translateY(-2px)}
+.sb:active{transform:scale(.95)}
+.sb.off{color:var(--c);opacity:.45;pointer-events:none;cursor:default}
 </style>
 </head>
 <body>
@@ -154,10 +175,16 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
     <div class="tools" id="tools"></div>
     <div class="ed" id="ed"></div>
     <div class="out" id="out" hidden>
+      <div class="rz" id="rz" title="Drag to resize"></div>
       <div class="outbar"><span class="otitle"><i data-lucide="terminal" width="14"></i>Output</span><span id="ostat"></span><span style="flex:1"></span>
+        <button class="tbtn sq" id="oin" aria-label="Program input" title="Input (stdin)"><i data-lucide="keyboard" width="14"></i></button>
+        <button class="tbtn pub" id="rerun" aria-label="Run" title="Run (Ctrl/⌘ + Enter in the input box)"><i data-lucide="play" width="14"></i><span>Run</span></button>
+        <button class="tbtn sq" id="ocopy" aria-label="Copy output" title="Copy output"><i data-lucide="copy" width="14"></i></button>
         <button class="tbtn sq" id="oclear" aria-label="Clear output" title="Clear"><i data-lucide="eraser" width="14"></i></button>
+        <button class="tbtn sq" id="omax" aria-label="Maximize output" title="Maximize"><i data-lucide="maximize-2" width="14"></i></button>
         <button class="tbtn sq" id="oclose" aria-label="Close output" title="Close (Esc)"><i data-lucide="x" width="14"></i></button></div>
-      <div class="obody" id="obody"></div>
+      <div class="split"><div class="sti" id="sti"><label for="stdin">Input (stdin)</label><textarea id="stdin" spellcheck="false" placeholder="Type program input here,&#10;one value per line. e.g.&#10;insert 5&#10;print&#10;end&#10;&#10;Then press Run (Ctrl/⌘ + Enter)"></textarea></div>
+      <div class="obody" id="obody"></div></div>
     </div>
   </section>
 
@@ -176,6 +203,7 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
         <div class="label"><i data-lucide="link-2" width="15"></i>Shareable Embed</div>
         <div class="field sm"><span id="embed">&lt;iframe src="https://dispatch.dev/embed/d7f3k9"&gt;&lt;/iframe&gt;</span><button class="cp" data-copy="embed" aria-label="Copy embed"><i data-lucide="copy" width="15"></i></button></div>
       </div>
+      <div class="emb a" style="--d:3"><div class="label"><i data-lucide="share-2" width="15"></i>Share</div><div class="qs" id="qs"></div></div>
     </div>
     <footer>© 2026 <b>Dispatch</b>. All rights reserved.</footer>
   </aside>
@@ -186,9 +214,9 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
 /* ====== CONFIG — fill these in (Supabase → Project Settings → API) ====== */
 const SUPABASE_URL='https://dqzqobcxolnruuerhncb.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxenFvYmN4b2xucnV1ZXJobmNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MTM2OTksImV4cCI6MjEwNzE4OTY5OX0.S2tWPhte7QBwUYm0ijm0TwTIWOs5Ym9KFVZoaLUYVFI';
-const LINK_BASE='https://dispatchh.vercel.app/';        // e.g. 'https://dispatch.dev/' for short links like https://dispatch.dev/aB3x9Z (needs a server rewrite, see README in the SQL file). Leave '' to use #hash links.
-const PATH_ROUTING=true;  // true only if your host rewrites /<id> to this page
-const TURNSTILE_SITE_KEY='0x4AAAAAAFUCGZtd5MxOQIut'; // Cloudflare Turnstile site key (see supabase-setup.sql header)
+const LINK_BASE='https://dispatchh.vercel.app/';
+const PATH_ROUTING=true;
+const TURNSTILE_SITE_KEY='0x4AAAAAAFUCGZtd5MxOQIut';
 /* ======================================================================= */
 const CAPTCHA_ON=!/YOUR-/.test(TURNSTILE_SITE_KEY);
 const CONFIGURED=!/YOUR-PROJECT|YOUR-ANON/.test(SUPABASE_URL+SUPABASE_ANON_KEY);
@@ -227,18 +255,34 @@ Go:'package import func return if else for range switch case break continue var 
 Rust:'fn let mut pub struct enum impl trait use mod return if else for while loop match break continue const static self Self true false as in',
 PHP:'function class return if else elseif foreach for while echo new public private protected static use namespace null true false try catch throw',
 SQL:'select from where insert into values update set delete create table drop alter join left right inner on group by order having limit as and or not null distinct union primary key',
-Shell:'if then else fi for do done while case esac function echo export sudo cd ls in',JSON:'true false null'};
+Shell:'if then else fi for do done while case esac function echo export sudo cd ls in',JSON:'true false null',
+'C#':'using namespace class static void int string bool var new return if else for foreach while public private protected null true false this async await try catch throw switch case break continue',
+Kotlin:'fun val var class object return if else for while when in is null true false this super try catch throw override open interface import package',
+Swift:'func let var class struct enum protocol return if else for while in switch case default guard import self nil true false try catch throw init extension',
+Ruby:'def end class module if elsif else unless while until for in do begin rescue ensure return yield nil true false self puts require',
+Lua:'function end local if then else elseif for while do repeat until return nil true false and or not in break',
+Perl:'my our sub use strict warnings if elsif else unless foreach for while return print',
+R:'function if else for while repeat return TRUE FALSE NULL NA in library',
+Haskell:'module import where let in if then else case of do data type class instance deriving'};
 function detect(c){
   const t=c.trim();if(!t)return 'Plain text';
   if(/^[\[{]/.test(t)){try{JSON.parse(t);return 'JSON'}catch(e){}}
   if(/^\s*<(!doctype|[a-z][\w-]*)\b/i.test(t)&&/<\/[\w-]+>|\/>/.test(t)&&!/<\?php/.test(t))return 'HTML';
+  if(/^use\s+strict|\bmy\s+[$@%]\w+/m.test(t))return 'Perl';
   if(/<\?php|\$\w+\s*=.*;/.test(t))return 'PHP';
   if(/^#!\/bin\/(ba)?sh|^\s*(echo|sudo|apt|npm|cd|export)\s/m.test(t)&&!/[{;]\s*$/m.test(t))return 'Shell';
   if(/\b(select|insert\s+into|create\s+table|delete\s+from|update)\b[\s\S]*\b(from|values|set|table)\b/i.test(t))return 'SQL';
   if(/#include\s*[<"]|std::|\bint\s+main\s*\(|\b(printf|scanf)\s*\(/.test(t))return /std::|\bcout\b|\bcin\b|#include\s*<(iostream|vector|string|map|set|algorithm|memory|sstream|fstream|cstdio|cstdlib|cstring|cmath)>|\bclass\s+\w+|\btemplate\s*<|\bnamespace\b|\bnullptr\b|\bnew\s+\w+|\bdelete\b/.test(t)?'C++':'C';
+  if(/\busing\s+System|Console\.(WriteLine|Write|ReadLine)|static\s+void\s+Main/.test(t))return 'C#';
   if(/public\s+(static\s+)?(class|void)|System\.out/.test(t))return 'Java';
+  if(/\bimport\s+(Foundation|SwiftUI|UIKit)|\bfunc\s+\w+\([^)]*\)\s*->|\blet\s+\w+\s*:\s*(Int|String|Double|Bool)\b/.test(t))return 'Swift';
+  if(/\bfun\s+\w+\s*\(|\bval\s+\w+\s*[:=]/.test(t))return 'Kotlin';
+  if(/^\s*main\s*::\s*IO|\bimport\s+qualified|^module\s+\w+\s+where/m.test(t))return 'Haskell';
   if(/^package\s+\w+|\bfunc\s+\w*\(|:=/m.test(t))return 'Go';
   if(/\bfn\s+\w+\s*\(|let\s+mut\s|println!/.test(t))return 'Rust';
+  if(/^\s*local\s+\w|\bthen\s*$|\bipairs\s*\(|\bpairs\s*\(/m.test(t)&&!/[;{]\s*$/m.test(t))return 'Lua';
+  if(/\bputs\s+\S|\bdo\s*\|\w+\||^\s*end\s*$/m.test(t)&&!/[;{]\s*$/m.test(t))return 'Ruby';
+  if(/\w\s*<-\s*\S|\blibrary\(\w+\)|\bcat\(/.test(t)&&!/[;{]\s*$/m.test(t))return 'R';
   if(/^\s*(def\s+\w+\(.*\)\s*:|class\s+\w+.*:|from\s+\w+\s+import|import\s+\w+\s*$|print\()/m.test(t)&&!/[;{]\s*$/m.test(t))return 'Python';
   if(/:\s*(string|number|boolean|any)\b|\binterface\s+\w+|\btype\s+\w+\s*=/.test(t))return 'TypeScript';
   if(/\b(const|let|var|function|async|await|console\.|require\(|alert\(|prompt\(|document\.|window\.|setTimeout\(|setInterval\(|Math\.|JSON\.|Promise\.)|=>|\b(for|while|if)\s*\(.*\)\s*\{|import\s.+from\s/.test(t))return 'JavaScript';
@@ -253,8 +297,8 @@ function hlLines(src,lang){
   if(lang==='HTML')return L.map(htmlLine);
   if(lang==='Markdown'||lang==='Plain text')return L.map(esc);
   const kws=new Set((KW[lang]||'').split(' ')),ci=lang==='SQL';
-  const lc=lang==='Python'||lang==='Shell'?'#':lang==='SQL'?'--':'//';
-  const blk=lang!=='Python'&&lang!=='Shell';
+  const lc=['Python','Shell','Ruby','Perl','R'].includes(lang)?'#':['SQL','Lua','Haskell'].includes(lang)?'--':'//';
+  const blk=!['Python','Shell','Ruby','Perl','R','Lua','Haskell'].includes(lang);
   const W=lang==='CSS'?'[\\w$-]*':'[\\w$]*';
   const re=new RegExp('('+lc.replace(/[\/\-#]/g,m=>'\\'+m)+'.*$)|('+(blk?'/\\*':'(?!)')+')|('+STR+')|\\b(\\d[\\d.]*)\\b|\\b([A-Za-z_$]'+W+')','g');
   let inB=false;
@@ -380,7 +424,7 @@ function toggleFull(){vt(()=>{const f=box.classList.toggle('full');const b=$('ex
 const FULL='<div class="sep"></div><button class="tbtn sq" id="expand" data-act="full" aria-label="Toggle fullscreen" title="Fullscreen (F)"><i data-lucide="'+'maximize-2" width="15"></i></button>';
 function setTools(kind){closeOut();
   tools.style.display=kind==='none'?'none':'';
-  tools.innerHTML=kind==='view'?RUNBTN+(cur&&owns(cur.id)?'<button class="tbtn" data-act="edit" title="Edit snippet (E)"><i data-lucide="pencil" width="15"></i><span>Edit</span></button>':'')+'<button class="tbtn" data-act="copy" title="Copy code (C)"><i data-lucide="copy" width="15"></i><span>Copy</span></button><button class="tbtn" data-act="dl" title="Download (D)"><i data-lucide="download" width="15"></i><span>Download</span></button>'+FULL
+  tools.innerHTML=kind==='view'?RUNBTN+(cur&&owns(cur.id)?'<button class="tbtn" data-act="edit" title="Edit snippet (E)"><i data-lucide="pencil" width="15"></i><span>Edit</span></button>':'')+'<button class="tbtn" data-act="copy" title="Copy code (C)"><i data-lucide="copy" width="15"></i><span>Copy</span></button><button class="tbtn" data-act="share" title="Share (S)"><i data-lucide="share-2" width="15"></i><span>Share</span></button><button class="tbtn" data-act="dl" title="Download (D)"><i data-lucide="download" width="15"></i><span>Download</span></button>'+FULL
     :kind==='edit'?RUNBTN+(editing?'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="check" width="15"></i><span>Save changes</span></button><button class="tbtn" data-act="cancel"><i data-lucide="x" width="15"></i><span>Cancel</span></button>':'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="send" width="15"></i><span>Publish</span></button><button class="tbtn" data-act="clear"><i data-lucide="eraser" width="15"></i><span>Clear</span></button>')+FULL:'';
   icons();
 }
@@ -390,7 +434,8 @@ function side(id,p){
   document.querySelectorAll('[data-copy]').forEach(b=>b.disabled=!id);
   $('up').textContent=p&&p.ts?fmt(p.ts):'Not published yet';
   $('lang').textContent=p?p.lang:'—';$('pill').style.display=p?'':'none';
-  const rb=document.querySelector('[data-act=run]');if(rb)rb.style.display=p&&RUNNABLE.includes(p.lang)?'':'none';
+  const rg=document.querySelector('.rungrp');if(rg)rg.style.display=p?'':'none';
+  const q=$('qs');if(q&&q._k!==id){q._k=id;q.innerHTML=shareHTML(id||'xxxxxx',p,!id);icons()}
 }
 
 /* ---------- views ---------- */
@@ -425,7 +470,7 @@ function showEditor(){
   ta.addEventListener('input',()=>{fitSoon();clearTimeout(t);t=setTimeout(()=>ta.isConnected&&side(editing?editing.id:null,ta.value.trim()?{lang:detect(ta.value),ts:editing&&editing.ts}:null),250)});
   ta.addEventListener('keydown',e=>{
     if(e.key==='Tab'){e.preventDefault();ta.setRangeText('  ',ta.selectionStart,ta.selectionEnd,'end');ta.dispatchEvent(new Event('input'))}
-    if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();publish()}
+    if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&!e.shiftKey){e.preventDefault();publish()}
   });
   ta.addEventListener('dragover',e=>e.preventDefault());
   ta.addEventListener('drop',async e=>{const f=e.dataTransfer.files[0];if(!f)return;e.preventDefault();ta.value=await f.text();ta.dispatchEvent(new Event('input'))});
@@ -446,7 +491,7 @@ async function publish(){
   toast(r==='shared'?'Published — your link is ready':'Saved in this browser only');
 }
 function download(){
-  const ext={JavaScript:'js',TypeScript:'ts',Python:'py',HTML:'html',CSS:'css',JSON:'json',Markdown:'md',C:'c','C++':'cpp',Java:'java',Go:'go',Rust:'rs',PHP:'php',SQL:'sql',Shell:'sh'}[cur.lang]||'txt';
+  const ext={JavaScript:'js',TypeScript:'ts',Python:'py',HTML:'html',CSS:'css',JSON:'json',Markdown:'md',C:'c','C++':'cpp',Java:'java',Go:'go',Rust:'rs',PHP:'php',SQL:'sql',Shell:'sh','C#':'cs',Kotlin:'kt',Swift:'swift',Ruby:'rb',Lua:'lua',Perl:'pl',R:'r',Haskell:'hs'}[cur.lang]||'txt';
   const u=URL.createObjectURL(new Blob([cur.code],{type:'text/plain'})),a=document.createElement('a');
   a.href=u;a.download=`dispatch-${cur.id}.${ext}`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);toast('Download started');
 }
@@ -459,13 +504,14 @@ tools.addEventListener('click',async e=>{
   else if(a==='edit'&&cur){editing={id:cur.id,ts:cur.ts};seed=cur.code;showEditor()}
   else if(a==='cancel'&&editing){const id=editing.id;editing=null;showView(id,cache[id])}
   else if(a==='run')runCode();
+  else if(a==='share')openShare();
   else if(a==='pub')publish();
   else if(a==='clear'){const ta=$('ta');ta.value='';ta.dispatchEvent(new Event('input'));ta.focus()}
 });
 document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{if(b.disabled)return;await copy($(b.dataset.copy).textContent);flash(b);toast('Copied to clipboard')});
 $('newBtn').onclick=()=>{box.classList.remove('full');if(!cur&&$('ta')){editing=null;seed='';showEditor();return}editing=null;nav('new')};
 const MOD=/Mac|iPhone|iPad/.test(navigator.userAgent)?'⌘':'Ctrl';
-const SC=[['N','Create new snippet'],['C','Copy code'],['L','Copy link'],['D','Download'],['R','Run code (JavaScript / HTML)'],['E','Edit your snippet'],['F','Fullscreen'],['T','Switch light / dark'],['Mod + Enter','Publish / save changes'],['Mod + S','Publish / save changes'],['Esc','Close / exit fullscreen'],['?','Show this list']];
+const SC=[['N','Create new snippet'],['C','Copy code'],['L','Copy link'],['D','Download'],['R','Run code (30+ languages)'],['F9','Run code, even while typing'],['Mod + Shift + Enter','Run code, even while typing'],['S','Share snippet'],['E','Edit your snippet'],['F','Fullscreen'],['T','Switch light / dark'],['Mod + Enter','Publish / save changes'],['Mod + S','Publish / save changes'],['Esc','Close / exit fullscreen'],['?','Show this list']];
 function toggleHelp(){
   const ex=document.querySelector('.kbwrap');if(ex){ex.remove();return}
   const w=document.createElement('div');w.className='kbwrap';
@@ -473,7 +519,7 @@ function toggleHelp(){
   w.onclick=e=>{if(e.target===w)w.remove()};
   document.body.appendChild(w);
 }
-const isTyping=t=>t&&(t.tagName==='TEXTAREA'||t.tagName==='INPUT'||t.isContentEditable);
+const isTyping=t=>t&&(t.tagName==='TEXTAREA'||t.tagName==='INPUT'||t.tagName==='SELECT'||t.isContentEditable);
 const press=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled)b.click()};
 document.addEventListener('keydown',e=>{
   const cx=document.getElementById('capX');
@@ -487,6 +533,7 @@ document.addEventListener('keydown',e=>{
   }
   if(cx)return;
   const mod=e.metaKey||e.ctrlKey;
+  if(e.key==='F9'||(mod&&e.shiftKey&&e.key==='Enter')){e.preventDefault();if($('lsel'))runCode();return}
   if(mod&&!e.altKey&&e.key.toLowerCase()==='s'){if($('ta')){e.preventDefault();publish()}return}
   if(mod||e.altKey||isTyping(e.target))return;
   if(e.key==='?'){e.preventDefault();toggleHelp();return}
@@ -496,6 +543,7 @@ document.addEventListener('keydown',e=>{
   else if(k==='c')press('[data-act=copy]');
   else if(k==='d')press('[data-act=dl]');
   else if(k==='r')press('[data-act=run]');
+  else if(k==='s')press('[data-act=share]');
   else if(k==='e')press('[data-act=edit]');
   else if(k==='f')press('[data-act=full]');
   else if(k==='l')press('[data-copy=link]');
@@ -503,9 +551,90 @@ document.addEventListener('keydown',e=>{
 });
 
 if(window.ResizeObserver)new ResizeObserver(()=>ed._fit&&ed._fit()).observe(ed);
+/* ---------- share ---------- */
+function shareHTML(id,p,off){
+  const u=linkFor(id),l=(p&&p.lang)||'code',t='Check out this '+l+' snippet on Dispatch',e=encodeURIComponent,m=e(t+'\n'+u);
+  return [['WhatsApp','message-circle','#25D366','https://wa.me/?text='+m],['Telegram','send','#229ED9','https://t.me/share/url?url='+e(u)+'&text='+e(t)],['Email','mail','#ea580c','mailto:?subject='+e('Code snippet: '+l)+'&body='+m],['SMS','message-square','#16a34a','sms:?&body='+m],['X','twitter','#888','https://twitter.com/intent/tweet?url='+e(u)+'&text='+e(t)],['Facebook','facebook','#1877F2','https://www.facebook.com/sharer/sharer.php?u='+e(u)],['LinkedIn','linkedin','#0A66C2','https://www.linkedin.com/sharing/share-offsite/?url='+e(u)]]
+  .map(([n,i,c,h])=>off?`<span class="sb off" style="--c:${c}" title="${n}"><i data-lucide="${i}" width="18"></i></span>`:`<a class="sb" style="--c:${c}" href="${h}"${/^http/.test(h)?' target="_blank" rel="noopener"':''}><i data-lucide="${i}" width="18"></i><span>${n}</span></a>`).join('')
+  +(!off&&navigator.share?'<button class="sb" data-native><i data-lucide="share-2" width="18"></i><span>More…</span></button>':'');
+}
+function openShare(){
+  if(!cur)return toast('Publish first to get a link');
+  const ex=document.querySelector('.kbwrap');if(ex)ex.remove();
+  const w=document.createElement('div');w.className='kbwrap';
+  w.innerHTML='<div class="kbcard" role="dialog" aria-modal="true" aria-label="Share"><h3>Share snippet</h3><div class="sg">'+shareHTML(cur.id,cur)+'</div><div class="field sm" style="margin-top:14px"><span>'+esc(linkFor(cur.id))+'</span><button class="cp" id="shcp" aria-label="Copy link"><i data-lucide="copy" width="15"></i></button></div></div>';
+  w.onclick=e=>{if(e.target===w)w.remove()};document.body.appendChild(w);icons();
+  w.querySelector('#shcp').onclick=async e=>{const b=e.currentTarget;await copy(linkFor(cur.id));flash(b);toast('Link copied')};
+}
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-native]');if(!b||!cur)return;try{await navigator.share({title:'Dispatch',text:'Check out this '+cur.lang+' snippet',url:linkFor(cur.id)})}catch(_){}});
 /* ---------- run code (JavaScript in a Worker, HTML in a sandboxed iframe) ---------- */
-const RUNNABLE=['JavaScript','HTML'];
-const RUNBTN='<button class="tbtn" data-act="run" title="Run (R)" style="display:none"><i data-lucide="play" width="15"></i><span>Run</span></button>';
+const J0='https://ce.judge0.com';
+const LID={'C':50,'C++':54,'C#':51,Java:62,Python:71,Go:60,Rust:73,PHP:68,TypeScript:74,Shell:46,SQL:82,Kotlin:78,Swift:83,Ruby:72,Lua:64,Perl:85,R:80,Haskell:61,Scala:81,Elixir:57,Erlang:58,Pascal:67,Fortran:59,OCaml:65,Prolog:69,Groovy:88,Clojure:86,Lisp:55,D:56,'F#':87,'Objective-C':79,Octave:66,'VB.NET':84,COBOL:77,Basic:47,Assembly:45};
+const RUNNABLE=['JavaScript','HTML',...Object.keys(LID)];
+const enc=s=>{const u=new TextEncoder().encode(s);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)};
+const dec=s=>s?new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0))):'';
+const needsInput=c=>/\binput\s*\(|\bscanf|\bcin\s*>>|\bgetline|\bScanner\b|readline|\bgets|\bfgets|ReadLine|System\.in|\bgetchar|^\s*read\s/m.test(c);
+const WB={C:'C','C++':'C++',Java:'Java',Python:'Python',Ruby:'Ruby',Go:'Go',Rust:'Rust',Haskell:'Haskell',Lua:'Lua',Perl:'Perl',PHP:'PHP',Swift:'Swift','C#':'C#',D:'D',Elixir:'Elixir',Erlang:'Erlang',OCaml:'OCaml',Pascal:'Pascal',Scala:'Scala',Groovy:'Groovy',Lisp:'Lisp',TypeScript:'TypeScript',Shell:'Bash script',SQL:'SQL'};
+let wbList=null;
+async function runWandbox(code,lang,add,stat,sg){
+  stat.textContent='Running on Wandbox…';
+  wbList=wbList||await (await fetch('https://wandbox.org/api/list.json',{signal:sg})).json();
+  const c=wbList.find(x=>x.language===WB[lang]&&!/head/.test(x.name))||wbList.find(x=>x.language===WB[lang]);
+  if(!c)throw new Error('no compiler');
+  const r=await (await fetch('https://wandbox.org/api/compile.json',{method:'POST',signal:sg,headers:{'Content-Type':'application/json'},body:JSON.stringify({compiler:c.name,code,stdin:$('stdin').value||''})})).json();
+  const ce=r.compiler_error,po=r.program_output,pe=r.program_error;
+  if(ce)add('error',ce.trimEnd());if(po)add('log',po.trimEnd());if(pe)add('error',pe.trimEnd());
+  if(!(ce||po||pe))add('sys','(no output)');
+  stat.textContent='Finished on Wandbox'+(r.status&&r.status!=='0'?' · exit '+r.status:'');
+}
+/* Python runs in the browser (Pyodide in a Worker): no server, no rate limit. Falls back to the server runners if it can't start. */
+const PYSRC=`importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');
+let py;onmessage=async e=>{try{if(!py){py=await loadPyodide();postMessage({t:'ready'})}
+const L=e.data.stdin.split('\\n');let i=0;
+py.setStdout({batched:s=>postMessage({t:'log',a:s})});py.setStderr({batched:s=>postMessage({t:'error',a:s})});py.setStdin({stdin:()=>i<L.length?L[i++]:undefined});
+await py.loadPackagesFromImports(e.data.code);await py.runPythonAsync(e.data.code)}catch(err){postMessage({t:'error',a:String(err.message||err)})}postMessage({t:'done'})}`;
+let pw=null,pt=null,pyReady=false,pyBusy=false;
+function runPy(code,add,stat){
+  let fin=false;
+  const fb=()=>{if(fin)return;fin=true;pyBusy=false;clearTimeout(pt);if(pw){pw.terminate();pw=null}pyReady=false;stat.textContent='Switching to server…';runRemote(code,'Python',add,stat)};
+  if(pw&&pyBusy){pw.terminate();pw=null;pyReady=false}
+  try{if(!pw)pw=new Worker(URL.createObjectURL(new Blob([PYSRC],{type:'text/javascript'})))}catch(e){return fb()}
+  const w=pw;pyBusy=true;
+  stat.textContent=pyReady?'Running…':'Loading Python (first run only)…';
+  w.onmessage=e=>{if(fin)return;const {t,a}=e.data;
+    if(t==='ready'){pyReady=true;stat.textContent='Running…'}
+    else if(t==='done'){fin=true;pyBusy=false;clearTimeout(pt);stat.textContent='Finished · Python (in browser)';if(!$('obody').children.length)add('sys','(no output)')}
+    else add(t,a)};
+  w.onerror=fb;
+  pt=setTimeout(()=>{if(fin)return;fin=true;pyBusy=false;if(pw){pw.terminate();pw=null}pyReady=false;add('error','Stopped: ran for more than 20 seconds');stat.textContent='Stopped'},20000);
+  w.postMessage({code,stdin:$('stdin').value||''});
+}
+let rc=null,asked='';
+async function runRemote(code,lang,add,stat){
+  const id=LID[lang];rc=new AbortController();const sg=rc.signal;
+  stat.textContent='Running on Judge0…';
+  if(lang==='Java'&&/public\s+class\s+(?!Main\b)\w+/.test(code))add('sys','Tip: this runner needs the public class to be named Main');
+  try{
+    const r=await fetch(J0+'/submissions?base64_encoded=true&wait=false',{method:'POST',signal:sg,headers:{'Content-Type':'application/json'},body:JSON.stringify({source_code:enc(code),language_id:id,stdin:enc($('stdin').value||'')})});
+    if(r.status===429)throw new Error('Free runner is busy (rate limit) — wait a few seconds and run again');
+    const j=await r.json();if(!j.token)throw new Error(j.message||j.error||'Runner rejected the request');
+    let d;
+    for(let i=0;i<45;i++){
+      await new Promise(f=>setTimeout(f,i<3?500:1000));
+      d=await (await fetch(J0+'/submissions/'+j.token+'?base64_encoded=true&fields=*',{signal:sg})).json();
+      if(d.status&&d.status.id>2)break;
+    }
+    if(!d||!d.status||d.status.id<=2)throw new Error('Runner took too long — try again');
+    const o=dec(d.stdout),e=dec(d.stderr),c=dec(d.compile_output),m=dec(d.message);
+    if(c)add('error',c.trimEnd());if(o)add('log',o.trimEnd());if(e)add('error',e.trimEnd());if(m)add('error',m);
+    if(!(o||e||c||m))add('sys','(no output)');
+    stat.textContent=(d.status.id===5?'Stopped':d.status.description)+(d.time?' · '+Math.round(d.time*1000)+' ms':'')+(d.memory?' · '+(d.memory/1024).toFixed(1)+' MB':'');
+  }catch(err){if(sg.aborted)return;
+    if(WB[lang]){try{await runWandbox(code,lang,add,stat,sg);rc=null;return}catch(e2){if(sg.aborted)return}}
+    stat.textContent='Failed';add('error',err.name==='TypeError'?'Could not reach the free runner — check your connection':err.message)}
+  rc=null;
+}
+const RUNBTN='<span class="rungrp" style="display:none"><select class="lsel" id="lsel" aria-label="Run as language" title="Run as"><option value="auto">Auto</option>'+RUNNABLE.slice().sort().map(l=>`<option>${l}</option>`).join('')+'</select><button class="tbtn" data-act="run" title="Run (R)"><i data-lucide="play" width="15"></i><span>Run</span></button></span>';
 const WSRC=`
 let fin=false,main=false,t0=0;const timers=new Set();
 const send=(t,a)=>postMessage({t,a});
@@ -528,12 +657,18 @@ self.onmessage=async e=>{
 };
 `;
 let wk=null,wt=null;
-function stopRun(){if(wk){wk.terminate();wk=null}clearTimeout(wt)}
+function stopRun(){if(rc){rc.abort();rc=null}if(wk){wk.terminate();wk=null}clearTimeout(wt)}
 function closeOut(){stopRun();const o=$('out');if(o){o.hidden=true;$('obody').innerHTML=''}}
 function runCode(){
-  const ta=$('ta'),code=ta?ta.value:cur&&cur.code,lang=ta?detect(code):cur&&cur.lang;
+  const ta=$('ta'),code=ta?ta.value:cur&&cur.code,lang0=ta?detect(code):cur&&cur.lang,sv=$('lsel')&&$('lsel').value,lang=sv&&sv!=='auto'?sv:lang0;
   if(!code||!code.trim())return toast('Nothing to run');
-  if(!RUNNABLE.includes(lang))return toast('Run supports JavaScript and HTML for now');
+  if(!RUNNABLE.includes(lang))return toast('Can\'t tell the language — pick one from the list next to Run');
+  const remote=lang!=='JavaScript'&&lang!=='HTML';
+  $('sti').hidden=!remote;
+  if(remote&&code!==asked&&needsInput(code)&&!$('stdin').value.trim()){
+    asked=code;stopRun();const b=$('obody');$('out').hidden=false;b.className='obody';b.innerHTML='<div class="ol sys">This program reads input. Type it in the Input box on the left (one value per line), then press Run ▶ — or press Run again to run with no input.</div>';
+    $('ostat').textContent='Waiting for input';$('stdin').focus();return;
+  }
   stopRun();
   const body=$('obody'),stat=$('ostat');$('out').hidden=false;body.className='obody';body.innerHTML='';
   if(lang==='HTML'){
@@ -548,6 +683,8 @@ function runCode(){
     const d=document.createElement('div');d.className='ol '+cls;d.textContent=txt;body.appendChild(d);body.scrollTop=body.scrollHeight;
   };
   stat.textContent='Running…';
+  if(lang==='Python'){runPy(code,add,stat);return}
+  if(lang!=='JavaScript'){runRemote(code,lang,add,stat);return}
   let url;
   try{url=URL.createObjectURL(new Blob([WSRC],{type:'text/javascript'}));wk=new Worker(url)}catch(e){stat.textContent='Failed';return add('error','Could not start the runner in this browser')}
   const end=()=>{stopRun();URL.revokeObjectURL(url)};
@@ -563,6 +700,14 @@ function runCode(){
 }
 $('oclear').onclick=()=>{$('obody').innerHTML=''};
 $('oclose').onclick=closeOut;
+$('rerun').onclick=runCode;
+$('stdin').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&!e.shiftKey){e.preventDefault();runCode()}});
+$('ocopy').onclick=async()=>{await copy($('obody').innerText);toast('Output copied')};
+$('oin').onclick=()=>{const t=$('sti');t.hidden=!t.hidden;if(!t.hidden)$('stdin').focus()};
+$('omax').onclick=()=>{const m=$('out').classList.toggle('max');$('omax').innerHTML=`<i data-lucide="${m?'minimize-2':'maximize-2'}" width="14"></i>`;icons()};
+$('rz').onpointerdown=e=>{e.preventDefault();const o=$('out'),y0=e.clientY,h0=o.offsetHeight;
+  const mv=v=>{o.style.height=Math.max(90,Math.min(innerHeight*.8,h0+y0-v.clientY))+'px'},up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up)};
 /* ---------- router ---------- */
 let routed=null;
 async function route(h=location.hash.replace(/^#\/?/,'')||pathId()){
