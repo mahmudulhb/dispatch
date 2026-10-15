@@ -901,7 +901,7 @@ _s.stdin=_DP()`;
 const shim=(code,lang)=>lang==='Python'?'exec('+JSON.stringify(PYSHIM)+')\n'+code:SHIM_C+code;
 let IL=[],keepIL=false,noShim=false,RUNOFF=0;
 const curStdin=()=>{const a=$('stdin').value||'';return a+(a&&!a.endsWith('\n')&&IL.length?'\n':'')+IL.map(x=>x+'\n').join('')};
-const WAITMSG='Waiting for input. Type in the terminal and press Enter (Ctrl+D = end of input)';
+const WAITMSG='Waiting. Ctrl+D for end.';
 function mkTin(onEnter,onEOF){
   const i=document.createElement('input');i.className='tin';i.type='text';i.autocomplete='off';i.spellcheck=false;i.autocapitalize='off';i.setAttribute('aria-label','Program input');
   const fit=()=>{i.style.width=Math.max(1,i.value.length+1)+'ch'};i.oninput=fit;fit();
