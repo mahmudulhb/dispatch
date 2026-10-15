@@ -178,6 +178,18 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
 .sb2:hover{background:var(--sub);color:var(--text)}.sb2.on{background:var(--accent);color:#fff}
 @media(max-width:900px){.hlay{left:45px;padding-left:12px;padding-right:14px}}
 @media(max-width:600px){.sbar{left:8px;right:8px}.sbar input{flex:1;width:auto;min-width:0}}
+.sym{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;gap:6px;overflow-x:auto;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--border);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.sym::-webkit-scrollbar{display:none}.sym[hidden]{display:none}
+.sym button{flex:none;min-width:40px;height:38px;padding:0 10px;border:1px solid var(--border);border-radius:9px;background:var(--sub);color:var(--text);font:500 16px 'JetBrains Mono',monospace;cursor:pointer;touch-action:manipulation}
+.sym button:active{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.symon .ed{padding-bottom:74px}
+#osave.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tin{background:transparent;border:0;border-bottom:1px solid var(--accent);color:inherit;font:inherit;outline:0;width:min(28ch,70%);padding:0 2px;caret-color:var(--accent)}
+#sti{display:none!important}
+.out .obody{background:#0d1117;color:#e6edf3;cursor:text;border-radius:0}
+.obody .ol,.obody .ol.log{color:#e6edf3}.obody .ol.error{color:#ff7b72}.obody .ol.warn{color:#e3b341}.obody .ol.result{color:#7ee787}.obody .ol.sys{color:#8b949e}
+.obody .eln:hover{background:rgba(255,123,114,.22)}
+.tin{background:transparent;border:0;outline:0;color:inherit;font:inherit;padding:0;margin:0;width:1ch;min-width:1ch;max-width:100%;caret-color:#7ee787;border-radius:0}
 </style>
 </head>
 <body>
@@ -196,14 +208,14 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
     <div class="ed" id="ed"></div>
     <div class="out" id="out" hidden>
       <div class="rz" id="rz" title="Drag to resize"></div>
-      <div class="outbar"><span class="otitle"><i data-lucide="terminal" width="14"></i>Output</span><span id="ostat"></span><span style="flex:1"></span>
-        <button class="tbtn sq" id="oin" aria-label="Program input" title="Input (stdin)"><i data-lucide="keyboard" width="14"></i></button>
+      <div class="outbar"><span class="otitle"><i data-lucide="terminal" width="14"></i>Terminal</span><span id="ostat"></span><span style="flex:1"></span>
         <button class="tbtn pub" id="rerun" aria-label="Run" title="Run (Ctrl/⌘ + Enter in the input box)"><i data-lucide="play" width="14"></i><span>Run</span></button>
+        <button class="tbtn sq" id="osave" aria-label="Data saver" title="Data saver: run Python on the server (skips the ~10 MB browser download)"><i data-lucide="cloud" width="14"></i></button>
         <button class="tbtn sq" id="ocopy" aria-label="Copy output" title="Copy output"><i data-lucide="copy" width="14"></i></button>
         <button class="tbtn sq" id="oclear" aria-label="Clear output" title="Clear"><i data-lucide="eraser" width="14"></i></button>
         <button class="tbtn sq" id="omax" aria-label="Maximize output" title="Maximize"><i data-lucide="maximize-2" width="14"></i></button>
         <button class="tbtn sq" id="oclose" aria-label="Close output" title="Close (Esc)"><i data-lucide="x" width="14"></i></button></div>
-      <div class="split"><div class="sti" id="sti"><label for="stdin">Input (stdin)</label><textarea id="stdin" spellcheck="false" placeholder="Type program input here,&#10;one value per line. e.g.&#10;insert 5&#10;print&#10;end&#10;&#10;Then press Run (Ctrl/⌘ + Enter)"></textarea></div>
+      <div class="split"><div class="sti" id="sti"><label for="stdin">Input (optional)</label><textarea id="stdin" spellcheck="false" placeholder="Optional: pre-fill input here.&#10;Or just press Run. The program asks&#10;in the output and you answer there.&#10;&#10;Ctrl/⌘ + Enter to run"></textarea></div>
       <div class="obody" id="obody"></div></div>
     </div>
   </section>
@@ -230,6 +242,8 @@ kbd{font:500 11px 'JetBrains Mono',monospace;background:var(--tile);border:1px s
 </main>
 <div class="toast" id="toast"><i data-lucide="check-circle-2" width="16"></i><span></span></div>
 
+<div class="sym" id="sym" hidden aria-label="Code symbols"></div>
+<input type="file" id="ocrfile" accept="image/*" hidden>
 <script>
 /* ====== CONFIG — fill these in (Supabase → Project Settings → API) ====== */
 const SUPABASE_URL='https://dqzqobcxolnruuerhncb.supabase.co';
@@ -445,7 +459,7 @@ const FULL='<div class="sep"></div><button class="tbtn sq" id="expand" data-act=
 function setTools(kind){closeOut();
   tools.style.display=kind==='none'?'none':'';
   tools.innerHTML=kind==='view'?RUNBTN+(cur&&owns(cur.id)?'<button class="tbtn" data-act="edit" title="Edit snippet (E)"><i data-lucide="pencil" width="15"></i><span>Edit</span></button>':'')+'<button class="tbtn" data-act="fork" title="Fork: edit a copy as a new snippet (K)"><i data-lucide="git-fork" width="15"></i><span>Fork</span></button><button class="tbtn" data-act="copy" title="Copy code (C)"><i data-lucide="copy" width="15"></i><span>Copy</span></button><button class="tbtn" data-act="share" title="Share (S)"><i data-lucide="share-2" width="15"></i><span>Share</span></button><button class="tbtn" data-act="dl" title="Download (D)"><i data-lucide="download" width="15"></i><span>Download</span></button>'+FULL
-    :kind==='edit'?RUNBTN+(editing?'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="check" width="15"></i><span>Save changes</span></button><button class="tbtn" data-act="cancel"><i data-lucide="x" width="15"></i><span>Cancel</span></button>':'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="send" width="15"></i><span>Publish</span></button><button class="tbtn" data-act="clear"><i data-lucide="eraser" width="15"></i><span>Clear</span></button>')+FULL:'';
+    :kind==='edit'?OCRBTN+RUNBTN+(editing?'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="check" width="15"></i><span>Save changes</span></button><button class="tbtn" data-act="cancel"><i data-lucide="x" width="15"></i><span>Cancel</span></button>':'<button class="tbtn pub" id="pubBtn" data-act="pub" title="Publish / save (Ctrl/⌘ + Enter)"><i data-lucide="send" width="15"></i><span>Publish</span></button><button class="tbtn" data-act="clear"><i data-lucide="eraser" width="15"></i><span>Clear</span></button>')+FULL:'';
   icons();
 }
 function side(id,p){
@@ -490,7 +504,7 @@ function showEditor(){
   ed._fit=fit;let raf=0;const fitSoon=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;fit()})};if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
   ta.addEventListener('input',()=>{fitSoon();clearTimeout(t);t=setTimeout(()=>ta.isConnected&&side(editing?editing.id:null,ta.value.trim()?{lang:detect(ta.value),ts:editing&&editing.ts}:null),250)});
   ta.addEventListener('keydown',e=>{
-    if(e.key==='Tab'){e.preventDefault();ta.setRangeText('  ',ta.selectionStart,ta.selectionEnd,'end');ta.dispatchEvent(new Event('input'))}
+    if(e.key==='Tab'){e.preventDefault();ta.setRangeText(unitOf(ta.value),ta.selectionStart,ta.selectionEnd,'end');ta.dispatchEvent(new Event('input'))}
     if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&!e.shiftKey){e.preventDefault();publish()}
   });
   ta.addEventListener('dragover',e=>e.preventDefault());
@@ -525,6 +539,7 @@ tools.addEventListener('click',async e=>{
   else if(a==='edit'&&cur){editing={id:cur.id,ts:cur.ts};seed=cur.code;showEditor()}
   else if(a==='cancel'&&editing){const id=editing.id;editing=null;showView(id,cache[id])}
   else if(a==='fork'&&cur){forkSeed=cur.code;nav('new');toast('Forked. Edit it, then publish as a new snippet')}
+  else if(a==='ocr')$('ocrfile').click();
   else if(a==='run')runCode();
   else if(a==='share')openShare();
   else if(a==='pub')publish();
@@ -657,7 +672,7 @@ function linkErrs(text,max){
   return text.split('\n').map(l=>{
     for(const [rx,g] of ERX){const m=rx.exec(l);if(!m)continue;
       if(rx===ERX[0][0]&&(/(^|\/)(usr|lib|opt)\//.test(m[1])||/\.(h|hpp|hh|hxx|tcc)$/i.test(m[1])))continue;
-      const n=+m[g];if(n>=1&&n<=max){const a=m.index;return esc(l.slice(0,a))+`<span class="eln" role="button" tabindex="0" data-ln="${n}" title="Go to line ${n}">`+esc(m[0])+'</span>'+esc(l.slice(a+m[0].length))}}
+      const n=+m[g]-RUNOFF;if(n>=1&&n<=max){const a=m.index;return esc(l.slice(0,a))+`<span class="eln" role="button" tabindex="0" data-ln="${n}" title="Go to line ${n}">`+esc(m[0])+'</span>'+esc(l.slice(a+m[0].length))}}
     return esc(l)}).join('\n');
 }
 const clearErr=()=>document.querySelectorAll('.eg').forEach(x=>x.classList.remove('eg'));
@@ -732,7 +747,98 @@ $('sbar').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!
   if(a==='next')srStep(1);else if(a==='prev')srStep(-1);else if(a==='x')srClose(true);
   else if(a==='cs'){SR.cs=!SR.cs;b.classList.toggle('on',SR.cs);srFind(false)}});
 $('obody').addEventListener('click',e=>{const a=e.target.closest('.eln');if(a)goLine(+a.dataset.ln)});
+$('obody').addEventListener('mouseup',e=>{if(String(getSelection()))return;const t=$('obody').querySelector('.tin');if(t&&e.target!==t)t.focus()});
 $('obody').addEventListener('keydown',e=>{const a=e.target.closest&&e.target.closest('.eln');if(a&&e.key==='Enter')goLine(+a.dataset.ln)});
+/* ---------- editor feel: auto-close, auto-indent, symbol row, scan, data saver ---------- */
+const PR={'(':')','[':']','{':'}','"':'"',"'":"'",'`':'`'},CLS=')]}"\'`';
+let AEB=false;
+const unitOf=v=>{const m=v.match(/^([ \t]+)\S/m);return !m?'    ':m[1][0]==='\t'?'\t':m[1].length%4===0?'    ':m[1].length%2===0?'  ':'    '};
+const lineStart=(v,a)=>a?v.lastIndexOf('\n',a-1)+1:0;
+function put(ta,text,caret){
+  const a=ta.selectionStart,b=ta.selectionEnd;AEB=true;
+  try{if(!document.execCommand('insertText',false,text)){ta.setRangeText(text,a,b,'end');ta.dispatchEvent(new Event('input',{bubbles:true}))}}finally{AEB=false}
+  const p=a+(caret==null?text.length:caret);ta.setSelectionRange(p,p);
+}
+function autoChar(ta,d){
+  const v=ta.value,a=ta.selectionStart,b=ta.selectionEnd,nx=v[b]||'',pv=v[a-1]||'';
+  if(a!==b){if(!PR[d])return false;const sel=v.slice(a,b);put(ta,d+sel+PR[d]);ta.setSelectionRange(a+1,a+1+sel.length);return true}
+  if(CLS.includes(d)&&nx===d){ta.setSelectionRange(a+1,a+1);return true}
+  if(d==='}'){const pre=v.slice(lineStart(v,a),a),u=unitOf(v);if(pre&&/^[ \t]+$/.test(pre)&&pre.endsWith(u)){ta.setSelectionRange(a-u.length,a);put(ta,'}');return true}}
+  if(PR[d]){
+    const q=d==='"'||d==="'"||d==='`';
+    if(q?(/\w/.test(pv)||/\w/.test(nx)):!(nx===''||/[\s)\]}.,;:]/.test(nx)))return false;
+    put(ta,d+PR[d],1);return true;
+  }
+  return false;
+}
+function autoEnter(ta){
+  const v=ta.value,a=ta.selectionStart,b=ta.selectionEnd,line=v.slice(lineStart(v,a),a),ind=(line.match(/^[ \t]*/)||[''])[0],u=unitOf(v),pv=v[a-1]||'',nx=v[b]||'';
+  if(a===b&&'{[('.includes(pv)&&PR[pv]===nx){put(ta,'\n'+ind+u+'\n'+ind,1+ind.length+u.length);return true}
+  const open=/[{(\[]\s*$/.test(line)||/^\s*(async\s+def|def|class|if|elif|else|for|while|try|except|finally|with)\b.*:\s*$/.test(line);
+  if(!ind&&!open)return false;
+  const t='\n'+ind+(open?u:'');put(ta,t);return true;
+}
+function autoBack(ta){
+  const v=ta.value,a=ta.selectionStart;if(!a||a!==ta.selectionEnd)return false;
+  const p=v[a-1];if(!(PR[p]&&PR[p]===v[a]))return false;
+  ta.setSelectionRange(a-1,a+1);AEB=true;
+  try{if(!document.execCommand('delete')){ta.setRangeText('',a-1,a+1,'end');ta.dispatchEvent(new Event('input',{bubbles:true}))}}finally{AEB=false}
+  return true;
+}
+document.addEventListener('beforeinput',e=>{
+  const ta=e.target;if(AEB||!ta||ta.id!=='ta'||e.isComposing)return;
+  const t=e.inputType;let h=false;
+  if(t==='insertText'&&e.data&&e.data.length===1)h=autoChar(ta,e.data);
+  else if(t==='insertLineBreak'||t==='insertParagraph')h=autoEnter(ta);
+  else if(t==='deleteContentBackward')h=autoBack(ta);
+  if(h)e.preventDefault();
+});
+/* symbol row (phones) */
+const SYMS=['Tab','{','}','(',')','[',']',';','"',"'",'<','>','=',':','/','\\','&','|','!','#','+','-','*','_','%','$','@','~','`','^','?',',','.'];
+$('sym').innerHTML=SYMS.map(k=>`<button type="button" data-k="${esc(k)}">${esc(k)}</button>`).join('');
+const touchy=()=>(window.matchMedia&&matchMedia('(pointer:coarse)').matches)||innerWidth<=900;
+const symShow=on=>{$('sym').hidden=!on;document.body.classList.toggle('symon',on);if(on)symPos()};
+function symPos(){const v=window.visualViewport;if(v)$('sym').style.bottom=Math.max(0,innerHeight-(v.height+v.offsetTop))+'px'}
+if(window.visualViewport){visualViewport.addEventListener('resize',symPos);visualViewport.addEventListener('scroll',symPos)}
+document.addEventListener('focusin',e=>{if(e.target.id==='ta'&&touchy())symShow(true)});
+document.addEventListener('focusout',e=>{if(e.target.id==='ta')setTimeout(()=>{if(!document.activeElement||document.activeElement.id!=='ta')symShow(false)},200)});
+$('sym').addEventListener('pointerdown',e=>{if(e.target.closest('button'))e.preventDefault()});
+$('sym').addEventListener('mousedown',e=>{if(e.target.closest('button'))e.preventDefault()});
+/* keep the caret line visible above the symbol row / keyboard */
+function caretVisible(){
+  const ta=$('ta');if(!ta||!ta.isConnected)return;
+  const pos=ta.selectionEnd,m=document.createElement('div');
+  m.className='mirror';m.style.width=ta.offsetWidth+'px';m.textContent=ta.value.slice(0,pos)+'\u200b';
+  ta.parentNode.appendChild(m);const y=m.offsetHeight;m.remove();
+  const bottom=ta.getBoundingClientRect().top+y,top=bottom-30,er=ed.getBoundingClientRect(),bar=$('sym');
+  const lim=Math.min(er.bottom,bar.hidden?Infinity:bar.getBoundingClientRect().top)-10,sc=ed.scrollHeight>ed.clientHeight+2?ed:(document.scrollingElement||document.documentElement);
+  if(bottom>lim)sc.scrollTop+=bottom-lim;else if(top<er.top+6)sc.scrollTop-=er.top+6-top;
+}
+document.addEventListener('input',e=>{if(e.target.id==='ta'&&!$('sym').hidden)requestAnimationFrame(()=>requestAnimationFrame(caretVisible))});
+$('sym').addEventListener('click',e=>{const b=e.target.closest('button'),ta=$('ta');if(!b||!ta)return;ta.focus({preventScroll:true});const k=b.dataset.k;if(k==='Tab')put(ta,unitOf(ta.value));else if(!autoChar(ta,k))put(ta,k);caretVisible()});
+/* scan code from a photo (OCR, runs in the browser) */
+async function ocrFile(f){
+  const ta=$('ta');if(!ta)return toast('Open the editor first');
+  toast('Reading image… the first scan downloads OCR data');
+  try{
+    if(!window.Tesseract)await loadJS('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+    const r=await Tesseract.recognize(f,'eng');
+    const t=(r.data.text||'').replace(/[\u201c\u201d]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/\u00a0/g,' ').replace(/[ \t]+$/gm,'').trim();
+    if(!t)return toast('No text found in the image');
+    ta.focus();put(ta,t);toast('Code added. Check symbols, scanning can make mistakes');
+  }catch(e){toast("Couldn't read the image: "+String(e.message||e).slice(0,60))}
+}
+$('ocrfile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f)ocrFile(f)});
+document.addEventListener('paste',e=>{if(!e.target||e.target.id!=='ta'||!e.clipboardData)return;const f=[...e.clipboardData.files].find(x=>/^image\//.test(x.type));if(f){e.preventDefault();ocrFile(f)}});
+/* data saver: run Python on the server instead of downloading Pyodide */
+function saver(){
+  let v=null;try{v=localStorage.getItem('dp_save')}catch(e){}
+  if(v==='1')return true;if(v==='0')return false;
+  const c=navigator.connection;return !!(c&&(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'')));
+}
+const saverUI=()=>$('osave').classList.toggle('on',saver());
+$('osave').onclick=()=>{const on=!saver();try{localStorage.setItem('dp_save',on?'1':'0')}catch(e){}saverUI();toast(on?'Data saver on: Python runs on the server':'Data saver off: Python runs in your browser')};
+saverUI();
 /* ---------- run code (JavaScript in a Worker, HTML in a sandboxed iframe) ---------- */
 const J0='https://ce.judge0.com';
 const LID={'C':50,'C++':54,'C#':51,Java:62,Python:71,Go:60,Rust:73,PHP:68,TypeScript:74,Shell:46,SQL:82,Kotlin:78,Swift:83,Ruby:72,Lua:64,Perl:85,R:80,Haskell:61,Scala:81,Elixir:57,Erlang:58,Pascal:67,Fortran:59,OCaml:65,Prolog:69,Groovy:88,Clojure:86,Lisp:55,D:56,'F#':87,'Objective-C':79,Octave:66,'VB.NET':84,COBOL:77,Basic:47,Assembly:45};
@@ -742,29 +848,116 @@ const dec=s=>s?new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(
 const needsInput=c=>/\binput\s*\(|\bscanf|\bcin\s*>>|\bgetline|\bScanner\b|readline|\bgets|\bfgets|ReadLine|System\.in|\bgetchar|^\s*read\s/m.test(c);
 const WB={C:'C','C++':'C++',Java:'Java',Python:'Python',Ruby:'Ruby',Go:'Go',Rust:'Rust',Haskell:'Haskell',Lua:'Lua',Perl:'Perl',PHP:'PHP',Swift:'Swift','C#':'C#',D:'D',Elixir:'Elixir',Erlang:'Erlang',OCaml:'OCaml',Pascal:'Pascal',Scala:'Scala',Groovy:'Groovy',Lisp:'Lisp',TypeScript:'TypeScript',Shell:'Bash script',SQL:'SQL'};
 let wbList=null;
-async function runWandbox(code,lang,add,stat,sg){
+/* ---------- interactive input (replay): the program asks, you answer inline ---------- */
+const MARK='@@DPNEED@@';
+const SHIM_C=`#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+#ifdef __cplusplus
+#include <iostream>
+#include <streambuf>
+#endif
+static FILE*__dpr;static char __dpl[65536];static size_t __dpn,__dpp;
+static ssize_t __dprd(void*c,char*b,size_t n){
+ if(__dpp>=__dpn){int ch,g=0;__dpn=__dpp=0;
+  while(__dpn<sizeof(__dpl)-2&&(ch=getc(__dpr))!=EOF){g=1;__dpl[__dpn++]=(char)ch;if(ch=='\\n')break;}
+  if(!g){fflush(stdout);fputs("${MARK}",stderr);fflush(stderr);_Exit(0);}
+  if(__dpl[__dpn-1]!='\\n')__dpl[__dpn++]='\\n';
+  fwrite(__dpl,1,__dpn,stdout);fflush(stdout);}
+ size_t k=__dpn-__dpp;if(k>n)k=n;for(size_t i=0;i<k;i++)b[i]=__dpl[__dpp+i];__dpp+=k;return (ssize_t)k;}
+#ifdef __cplusplus
+struct __DPB:std::streambuf{char ch;protected:int underflow()override{int c=getc(stdin);if(c==EOF)return EOF;ch=(char)c;setg(&ch,&ch,&ch+1);return (unsigned char)ch;}};
+static __DPB __dpb;
+#endif
+__attribute__((constructor)) static void __dpinit(){
+ __dpr=stdin;cookie_io_functions_t f;f.read=__dprd;f.write=0;f.seek=0;f.close=0;
+ stdin=fopencookie(0,"r",f);setvbuf(stdin,0,_IONBF,0);
+#ifdef __cplusplus
+ std::cin.rdbuf(&__dpb);
+#endif
+}
+#ifdef __cplusplus
+#define sync_with_stdio(...) sync_with_stdio(true)
+#endif
+#line 1
+`;
+const PYSHIM=`import sys as _s,os as _o
+class _DP:
+    def __init__(s):s.f=_s.stdin
+    def readline(s,*a):
+        l=s.f.readline()
+        if l=='':
+            _s.stdout.flush();_s.stderr.write('${MARK}');_s.stderr.flush();_o._exit(0)
+        if not l.endswith('\\n'):l+='\\n'
+        _s.stdout.write(l);_s.stdout.flush();return l
+    def __iter__(s):return s
+    def __next__(s):return s.readline()
+    def read(s,*a):return ''.join(s.f.readlines())
+    def readlines(s,*a):return s.f.readlines()
+    def isatty(s):return False
+_s.stdin=_DP()`;
+const shim=(code,lang)=>lang==='Python'?'exec('+JSON.stringify(PYSHIM)+')\n'+code:SHIM_C+code;
+let IL=[],keepIL=false,noShim=false,RUNOFF=0;
+const curStdin=()=>{const a=$('stdin').value||'';return a+(a&&!a.endsWith('\n')&&IL.length?'\n':'')+IL.map(x=>x+'\n').join('')};
+const WAITMSG='Waiting for input. Type in the terminal and press Enter (Ctrl+D = end of input)';
+function mkTin(onEnter,onEOF){
+  const i=document.createElement('input');i.className='tin';i.type='text';i.autocomplete='off';i.spellcheck=false;i.autocapitalize='off';i.setAttribute('aria-label','Program input');
+  const fit=()=>{i.style.width=Math.max(1,i.value.length+1)+'ch'};i.oninput=fit;fit();
+  i.onkeydown=ev=>{
+    if(ev.key==='Enter'){ev.preventDefault();onEnter(i)}
+    else if(onEOF&&ev.ctrlKey&&ev.key.toLowerCase()==='d'){ev.preventDefault();onEOF()}
+  };
+  return i;
+}
+function addPrompt(o){
+  const b=$('obody'),d=document.createElement('div');d.className='ol log';d.textContent=o;
+  const i=mkTin(x=>{IL.push(x.value);keepIL=true;runCode()},()=>{noShim=true;keepIL=true;runCode()});
+  d.appendChild(i);b.appendChild(d);i.focus();b.scrollTop=b.scrollHeight;
+}
+let gathered=false;
+function gatherInput(){
+  const b=$('obody');$('out').hidden=false;b.className='obody';b.innerHTML='';$('ostat').textContent='Waiting for input';
+  const note=document.createElement('div');note.className='ol sys';note.textContent="This language can't pause for input yet. Type every input line, then press Enter on an empty line to run.";b.appendChild(note);
+  const row=()=>{const d=document.createElement('div');d.className='ol log';
+    const i=mkTin(x=>{if(x.value===''){gathered=true;keepIL=true;runCode();return}IL.push(x.value);x.replaceWith(document.createTextNode(x.value));row()},null);
+    d.appendChild(i);b.appendChild(d);i.focus();b.scrollTop=b.scrollHeight};
+  row();
+}
+function emitRes(add,o,e,c,m,inter){
+  let need=false;
+  if(inter&&e.includes(MARK)){need=true;e=e.split(MARK).join('').trim()}
+  if(c)add('error',c.trimEnd());
+  if(!need&&o)add('log',o.trimEnd());
+  if(e)add('error',e.trimEnd());if(m)add('error',m);
+  if(need)addPrompt(o);else if(!(o||e||c||m))add('sys','(no output)');
+  return need;
+}
+const gfetch=(sg,u,o)=>fetch(u,o).then(r=>{if(sg.aborted)throw new Error('aborted');return r});
+async function runWandbox(code,lang,add,stat,sg,inter){
   stat.textContent='Running on Wandbox…';
-  wbList=wbList||await (await fetch('https://wandbox.org/api/list.json',{signal:sg})).json();
+  wbList=wbList||await (await gfetch(sg,'https://wandbox.org/api/list.json')).json();
   const c=wbList.find(x=>x.language===WB[lang]&&!/head/.test(x.name))||wbList.find(x=>x.language===WB[lang]);
   if(!c)throw new Error('no compiler');
-  const r=await (await fetch('https://wandbox.org/api/compile.json',{method:'POST',signal:sg,headers:{'Content-Type':'application/json'},body:JSON.stringify({compiler:c.name,code,stdin:$('stdin').value||''})})).json();
-  const ce=r.compiler_error,po=r.program_output,pe=r.program_error;
-  if(ce)add('error',ce.trimEnd());if(po)add('log',po.trimEnd());if(pe)add('error',pe.trimEnd());
-  if(!(ce||po||pe))add('sys','(no output)');
-  stat.textContent='Finished on Wandbox'+(r.status&&r.status!=='0'?' · exit '+r.status:'');
+  const r=await (await gfetch(sg,'https://wandbox.org/api/compile.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({compiler:c.name,code,stdin:curStdin()})})).json();
+  const need=emitRes(add,r.program_output||'',r.program_error||'',r.compiler_error||'','',inter);
+  stat.textContent=need?WAITMSG:'Finished on Wandbox'+(r.status&&r.status!=='0'?' · exit '+r.status:'');
 }
 /* Python runs in the browser (Pyodide in a Worker): no server, no rate limit. Falls back to the server runners if it can't start. */
 const PYSRC=`importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');
-let py,pyP;onmessage=async e=>{try{if(!py){py=await(pyP=pyP||loadPyodide());postMessage({t:'ready'})}
+let py,pyP;onmessage=async e=>{
+if(!py){try{py=await(pyP=pyP||loadPyodide());postMessage({t:'ready'})}catch(err){pyP=null;postMessage({t:'loadfail'});return}}
 if(e.data.warm)return;
-const L=e.data.stdin.split('\\n');let i=0;
+try{const L=e.data.stdin.split('\\n');let i=0;
 py.setStdout({batched:s=>postMessage({t:'log',a:s})});py.setStderr({batched:s=>postMessage({t:'error',a:s})});py.setStdin({stdin:()=>i<L.length?L[i++]:undefined});
-await py.loadPackagesFromImports(e.data.code);await py.runPythonAsync(e.data.code)}catch(err){postMessage({t:'error',a:String(err.message||err)})}postMessage({t:'done'})}`;
-let pw=null,pt=null,pyReady=false,pyBusy=false;
+try{await py.loadPackagesFromImports(e.data.code)}catch(_){}
+await py.runPythonAsync(e.data.code)}catch(err){postMessage({t:'error',a:String(err.message||err)})}postMessage({t:'done'})}`;
+let pw=null,pt=null,pyReady=false,pyBusy=false,pyBad=false;
 function warmPy(){
-  if(pw)return;
+  if(pw||pyBad||saver())return;
   try{pw=new Worker(URL.createObjectURL(new Blob([PYSRC],{type:'text/javascript'})));
-    pw.onmessage=e=>{if(e.data.t==='ready')pyReady=true};pw.onerror=()=>{if(pw){pw.terminate();pw=null}pyReady=false};
+    pw.onmessage=e=>{if(e.data.t==='ready')pyReady=true;else if(e.data.t==='loadfail'){pyBad=true;if(pw){pw.terminate();pw=null}pyReady=false}};pw.onerror=()=>{if(pw){pw.terminate();pw=null}pyReady=false};
     pw.postMessage({warm:1,code:'',stdin:''})}catch(e){pw=null}
 }
 function runPy(code,add,stat){
@@ -776,6 +969,7 @@ function runPy(code,add,stat){
   stat.textContent=pyReady?'Running…':'Loading Python (first run only)…';
   w.onmessage=e=>{if(fin)return;const {t,a}=e.data;
     if(t==='ready'){pyReady=true;stat.textContent='Running…'}
+    else if(t==='loadfail'){pyBad=true;fb()}
     else if(t==='done'){fin=true;pyBusy=false;clearTimeout(pt);stat.textContent='Finished · Python (in browser)';if(!$('obody').children.length)add('sys','(no output)')}
     else add(t,a)};
   w.onerror=fb;
@@ -784,15 +978,16 @@ function runPy(code,add,stat){
 }
 let rc=null,asked='',J0W=true;
 const pref=()=>{try{return localStorage.getItem('dp_runner')}catch(e){return null}},setPref=v=>{try{localStorage.setItem('dp_runner',v)}catch(e){}};
-async function runRemote(code,lang,add,stat){
-  const id=LID[lang];rc=new AbortController();const sg=rc.signal;
+async function runRemote(code,lang,add,stat,inter){
+  const id=LID[lang];rc={aborted:false,abort(){this.aborted=true}};const sg=rc;
   const t0=Date.now(),tick=setInterval(()=>{const x=stat.textContent;if(x.startsWith('Running'))stat.textContent=x.replace(/ · \d+s$/,'')+' · '+((Date.now()-t0)/1000|0)+'s'},500);
   const stop=()=>clearInterval(tick);
-  if(pref()==='w'&&WB[lang]){try{await runWandbox(code,lang,add,stat,sg);stop();rc=null;return}catch(e0){if(sg.aborted){stop();return}setPref('j')}}
+  const src=inter?shim(code,lang):code;RUNOFF=inter&&lang==='Python'?1:0;
+  if(pref()==='w'&&WB[lang]){try{await runWandbox(src,lang,add,stat,sg,inter);stop();rc=null;return}catch(e0){if(sg.aborted){stop();return}setPref('j')}}
   stat.textContent='Running on Judge0…';
   if(lang==='Java'&&/public\s+class\s+(?!Main\b)\w+/.test(code))add('sys','Tip: this runner needs the public class to be named Main');
   try{
-    const body=JSON.stringify({source_code:enc(code),language_id:id,stdin:enc($('stdin').value||'')}),post=w=>fetch(J0+'/submissions?base64_encoded=true&fields=*&wait='+w,{method:'POST',signal:sg,headers:{'Content-Type':'application/json'},body});
+    const body=JSON.stringify({source_code:enc(src),language_id:id,stdin:enc(curStdin())}),post=w=>gfetch(sg,J0+'/submissions?base64_encoded=true&fields=*&wait='+w,{method:'POST',headers:{'Content-Type':'application/json'},body});
     let r=await post(J0W?'true':'false');
     if(r.status===429)throw new Error('Free runner is busy (rate limit) — wait a few seconds and run again');
     let j=await r.json(),d=null;
@@ -803,19 +998,19 @@ async function runRemote(code,lang,add,stat){
     }
     for(let i=0;!d&&i<70;i++){
       await new Promise(f=>setTimeout(f,i<4?300:i<10?600:1000));
-      const q=await (await fetch(J0+'/submissions/'+j.token+'?base64_encoded=true&fields=*',{signal:sg})).json();
+      const q=await (await gfetch(sg,J0+'/submissions/'+j.token+'?base64_encoded=true&fields=*')).json();
       if(q.status&&q.status.id>2)d=q;
     }
     if(!d||!d.status||d.status.id<=2)throw new Error('Runner took too long — try again');
     const o=dec(d.stdout),e=dec(d.stderr),c=dec(d.compile_output),m=dec(d.message);
-    if(c)add('error',c.trimEnd());if(o)add('log',o.trimEnd());if(e)add('error',e.trimEnd());if(m)add('error',m);
-    if(!(o||e||c||m))add('sys','(no output)');
-    stat.textContent=(d.status.id===5?'Stopped':d.status.description)+(d.time?' · '+Math.round(d.time*1000)+' ms':'')+(d.memory?' · '+(d.memory/1024).toFixed(1)+' MB':'');
+    const need=emitRes(add,o,e,c,m,inter);
+    stat.textContent=need?WAITMSG:(d.status.id===5?'Stopped':d.status.description)+(d.time?' · '+Math.round(d.time*1000)+' ms':'')+(d.memory?' · '+(d.memory/1024).toFixed(1)+' MB':'');
   }catch(err){if(sg.aborted)return;
-    if(WB[lang]){try{await runWandbox(code,lang,add,stat,sg);setPref('w');rc=null;return}catch(e2){if(sg.aborted)return}}
+    if(WB[lang]){try{await runWandbox(src,lang,add,stat,sg,inter);setPref('w');rc=null;return}catch(e2){if(sg.aborted)return}}
     stat.textContent='Failed';add('error',err.name==='TypeError'?'Could not reach the free runner — check your connection':err.message)}finally{stop()}
   rc=null;
 }
+const OCRBTN='<button class="tbtn" data-act="ocr" title="Scan code from a photo"><i data-lucide="camera" width="15"></i><span>Scan</span></button>';
 const RUNBTN='<span class="rungrp" style="display:none"><select class="lsel" id="lsel" aria-label="Run as language" title="Run as"><option value="auto">Auto</option>'+RUNNABLE.slice().sort().map(l=>`<option>${l}</option>`).join('')+'</select><button class="tbtn" data-act="run" title="Run (R)"><i data-lucide="play" width="15"></i><span>Run</span></button></span>';
 const WSRC=`
 let fin=false,main=false,t0=0;const timers=new Set();
@@ -845,12 +1040,13 @@ function runCode(){
   const ta=$('ta'),code=ta?ta.value:cur&&cur.code,lang0=ta?detect(code):cur&&cur.lang,sv=$('lsel')&&$('lsel').value,lang=sv&&sv!=='auto'?sv:lang0;
   if(!code||!code.trim())return toast('Nothing to run');
   if(!RUNNABLE.includes(lang))return toast('Can\'t tell the language — pick one from the list next to Run');
+  if(!keepIL)IL=[];keepIL=false;
   const remote=lang!=='JavaScript'&&lang!=='HTML';
   $('sti').hidden=!remote;
-  if(remote&&code!==asked&&needsInput(code)&&!$('stdin').value.trim()){
-    asked=code;stopRun();const b=$('obody');$('out').hidden=false;b.className='obody';b.innerHTML='<div class="ol sys">This program reads input. Type it in the Input box on the left (one value per line), then press Run ▶ — or press Run again to run with no input.</div>';
-    $('ostat').textContent='Waiting for input';$('stdin').focus();return;
-  }
+  const ns=noShim;noShim=false;
+  const inter=remote&&!ns&&['C','C++','Python'].includes(lang)&&needsInput(code);
+  if(remote&&!inter&&!ns&&needsInput(code)&&!IL.length&&!gathered){stopRun();gatherInput();return}
+  gathered=false;
   stopRun();
   const body=$('obody'),stat=$('ostat');$('out').hidden=false;body.className='obody';body.innerHTML='';clearErr();
   if(lang==='HTML'){
@@ -866,8 +1062,8 @@ function runCode(){
     const d=document.createElement('div');d.className='ol '+cls;if(cls==='error')d.innerHTML=linkErrs(txt,nl);else d.textContent=txt;body.appendChild(d);body.scrollTop=body.scrollHeight;
   };
   stat.textContent='Running…';
-  if(lang==='Python'){runPy(code,add,stat);return}
-  if(lang!=='JavaScript'){runRemote(code,lang,add,stat);return}
+  if(lang==='Python'&&!saver()&&!pyBad&&!inter){runPy(code,add,stat);return}
+  if(lang!=='JavaScript'){runRemote(code,lang,add,stat,inter);return}
   let url;
   try{url=URL.createObjectURL(new Blob([WSRC],{type:'text/javascript'}));wk=new Worker(url)}catch(e){stat.textContent='Failed';return add('error','Could not start the runner in this browser')}
   const end=()=>{stopRun();URL.revokeObjectURL(url)};
@@ -886,7 +1082,6 @@ $('oclose').onclick=closeOut;
 $('rerun').onclick=runCode;
 $('stdin').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&!e.shiftKey){e.preventDefault();runCode()}});
 $('ocopy').onclick=async()=>{await copy($('obody').innerText);toast('Output copied')};
-$('oin').onclick=()=>{const t=$('sti');t.hidden=!t.hidden;if(!t.hidden)$('stdin').focus()};
 $('omax').onclick=()=>{const m=$('out').classList.toggle('max');$('omax').innerHTML=`<i data-lucide="${m?'minimize-2':'maximize-2'}" width="14"></i>`;icons()};
 $('rz').onpointerdown=e=>{e.preventDefault();const o=$('out'),y0=e.clientY,h0=o.offsetHeight;
   const mv=v=>{o.style.height=Math.max(90,Math.min(innerHeight*.8,h0+y0-v.clientY))+'px'},up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};
