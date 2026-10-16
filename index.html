@@ -190,6 +190,54 @@ body.symon .ed{padding-bottom:74px}
 .obody .ol,.obody .ol.log{color:#e6edf3}.obody .ol.error{color:#ff7b72}.obody .ol.warn{color:#e3b341}.obody .ol.result{color:#7ee787}.obody .ol.sys{color:#8b949e}
 .obody .eln:hover{background:rgba(255,123,114,.22)}
 .tin{background:transparent;border:0;outline:0;color:inherit;font:inherit;padding:0;margin:0;width:1ch;min-width:1ch;max-width:100%;caret-color:#7ee787;border-radius:0}
+.obody .ol.hint{color:#e3b341;border-left:3px solid #e3b341;padding-left:10px;margin:8px 0 4px}
+#ohint{font:600 12px 'Inter',sans-serif;min-width:34px}
+/* ---- IDE terminal panel (VS Code style) ---- */
+.out{background:#1e1e1e;border-top:1px solid #3c3c3c;color:#cccccc}
+.tbar{display:flex;align-items:center;gap:8px;padding:0 8px 0 4px;background:#252526;border-bottom:1px solid #3c3c3c;min-height:36px;overflow-x:auto;scrollbar-width:none;user-select:none}
+.tbar::-webkit-scrollbar{display:none}
+.tabs{display:flex;align-self:stretch}
+.otab{display:flex;align-items:center;gap:6px;padding:0 12px;border:0;border-bottom:2px solid transparent;background:none;color:#969696;font:600 11px/1 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-bottom:-1px;white-space:nowrap}
+.otab:hover{color:#fff}.otab.on{color:#fff;border-bottom-color:var(--accent)}
+.pbadge{min-width:16px;height:16px;padding:0 5px;border-radius:8px;background:#f14c4c;color:#fff;font:700 10px/16px Inter,sans-serif;text-align:center;letter-spacing:0}
+.pbadge[hidden]{display:none}.pbadge.warn{background:#cca700;color:#111}
+.ostat{display:inline-flex;align-items:center;gap:7px;max-width:42vw;overflow:hidden;text-overflow:ellipsis;font:500 12px Inter,sans-serif;color:#9d9d9d;white-space:nowrap}
+.ostat:empty{display:none}
+.ostat::before{content:"";width:8px;height:8px;border-radius:50%;background:#6e7681;flex:none}
+.ostat[data-state=running]::before{background:#cca700;animation:tpulse 1s infinite}
+.ostat[data-state=waiting]::before{background:#3794ff;animation:tpulse 1.4s infinite}
+.ostat[data-state=ok]::before{background:#89d185}.ostat[data-state=err]::before{background:#f48771}.ostat[data-state=stopped]::before{background:#858585}
+@keyframes tpulse{50%{opacity:.3}}
+.tfill{flex:1;min-width:6px}
+.tact{display:flex;align-items:center;gap:2px}
+.tsep{width:1px;height:16px;background:#3c3c3c;margin:0 4px;flex:none}
+.tbar .tbtn{height:28px}.tbar .tbtn.sq{width:28px;padding:0;justify-content:center}
+.tbar .tbtn:not(.pub){background:transparent;border-color:transparent;color:#cccccc;box-shadow:none}
+.tbar .tbtn:not(.pub):hover{background:#2a2d2e;color:#fff}
+.tbar .tbtn.stop{color:#f48771}.tbar .tbtn.stop:hover{background:rgba(244,135,113,.16);color:#f48771}
+.tbar .tbtn[hidden]{display:none}
+#ofm,#ofp{font:600 11px Inter,sans-serif}#owrap.on{background:#37373d;color:#fff}
+.rbar{display:flex;align-items:center;gap:10px;padding:5px 14px;background:#1e1e1e;border-bottom:1px solid #2d2d2d;font:12px 'JetBrains Mono',monospace;color:#858585;white-space:nowrap;overflow:hidden}
+.rbar:empty,.rbar[hidden]{display:none}
+.rlang{flex:none;padding:1px 7px;border-radius:4px;background:#37373d;color:#cccccc;font:600 11px Inter,sans-serif}
+#rcmd{overflow:hidden;text-overflow:ellipsis;color:#9cdcfe;font:inherit}#rcmd::before{content:"$ ";color:#89d185}
+.rrun{flex:none;margin-left:auto;font:500 11px Inter,sans-serif;color:#858585}
+.out .obody{--tfs:13px;font-size:var(--tfs);line-height:1.6;background:#1e1e1e;color:#cccccc}
+.out .obody.nowrap{white-space:pre;overflow-wrap:normal;overflow-x:auto}
+.obody ::selection,.oprob ::selection{background:#264f78}
+.obody .ol,.obody .ol.log{color:#cccccc}.obody .ol.error{color:#f48771}.obody .ol.warn{color:#cca700}.obody .ol.result{color:#89d185}.obody .ol.sys{color:#858585}
+.obody .ol.hint{color:#cca700;border-left-color:#cca700}
+.obody .ol.exit{margin-top:6px;font-size:.92em}.obody .ol.exit.ok{color:#89d185}.obody .ol.exit.bad{color:#f48771}
+.tin{caret-color:#aeafad}
+.oprob{flex:1;min-width:0;overflow:auto;padding:6px 0;font:13px/1.5 Inter,sans-serif;color:#cccccc;background:#1e1e1e}
+.oprob[hidden]{display:none}
+.prow{display:flex;gap:10px;align-items:baseline;padding:5px 16px;cursor:pointer;border-left:2px solid transparent;outline:0}
+.prow:hover,.prow:focus{background:#2a2d2e;border-left-color:var(--accent)}
+.prow .pi{flex:none;font-weight:700}.prow.error .pi{color:#f48771}.prow.warning .pi{color:#cca700}
+.prow .pm{flex:1;min-width:0;font:12.5px 'JetBrains Mono',monospace;overflow-wrap:anywhere}
+.prow .pl{flex:none;color:#858585;font-size:12px;white-space:nowrap}
+.pempty{padding:18px 16px;color:#858585;font-size:13px}
+@media(max-width:700px){.tbar .sec,#rcmd{display:none}.ostat{max-width:30vw}}
 </style>
 </head>
 <body>
@@ -208,15 +256,34 @@ body.symon .ed{padding-bottom:74px}
     <div class="ed" id="ed"></div>
     <div class="out" id="out" hidden>
       <div class="rz" id="rz" title="Drag to resize"></div>
-      <div class="outbar"><span class="otitle"><i data-lucide="terminal" width="14"></i>Terminal</span><span id="ostat"></span><span style="flex:1"></span>
-        <button class="tbtn pub" id="rerun" aria-label="Run" title="Run (Ctrl/⌘ + Enter in the input box)"><i data-lucide="play" width="14"></i><span>Run</span></button>
-        <button class="tbtn sq" id="osave" aria-label="Data saver" title="Data saver: run Python on the server (skips the ~10 MB browser download)"><i data-lucide="cloud" width="14"></i></button>
-        <button class="tbtn sq" id="ocopy" aria-label="Copy output" title="Copy output"><i data-lucide="copy" width="14"></i></button>
-        <button class="tbtn sq" id="oclear" aria-label="Clear output" title="Clear"><i data-lucide="eraser" width="14"></i></button>
-        <button class="tbtn sq" id="omax" aria-label="Maximize output" title="Maximize"><i data-lucide="maximize-2" width="14"></i></button>
-        <button class="tbtn sq" id="oclose" aria-label="Close output" title="Close (Esc)"><i data-lucide="x" width="14"></i></button></div>
-      <div class="split"><div class="sti" id="sti"><label for="stdin">Input (optional)</label><textarea id="stdin" spellcheck="false" placeholder="Optional: pre-fill input here.&#10;Or just press Run. The program asks&#10;in the output and you answer there.&#10;&#10;Ctrl/⌘ + Enter to run"></textarea></div>
-      <div class="obody" id="obody"></div></div>
+      <div class="tbar" id="tbar">
+        <div class="tabs" role="tablist">
+          <button class="otab on" id="otabT" role="tab" aria-selected="true"><i data-lucide="terminal" width="13"></i>Terminal</button>
+          <button class="otab" id="otabP" role="tab" aria-selected="false"><i data-lucide="circle-alert" width="13"></i>Problems<span class="pbadge" id="pbadge" hidden>0</span></button>
+        </div>
+        <span class="ostat" id="ostat"></span>
+        <span class="tfill"></span>
+        <div class="tact">
+          <button class="tbtn pub" id="rerun" aria-label="Run" title="Run (F9)"><i data-lucide="play" width="14"></i><span>Run</span></button>
+          <button class="tbtn sq stop" id="ostop" aria-label="Stop" title="Stop (Ctrl+C)" hidden><i data-lucide="square" width="13"></i></button>
+          <span class="tsep"></span>
+          <button class="tbtn sq" id="ohint" aria-label="Error hint language" title="Error hints: English / বাংলা"></button>
+          <button class="tbtn sq" id="osave" aria-label="Data saver" title="Data saver: run Python on the server (skips the ~10 MB browser download)"><i data-lucide="cloud" width="14"></i></button>
+          <button class="tbtn sq sec" id="ofm" aria-label="Smaller text" title="Smaller text">A-</button>
+          <button class="tbtn sq sec" id="ofp" aria-label="Bigger text" title="Bigger text">A+</button>
+          <button class="tbtn sq sec" id="owrap" aria-label="Word wrap" title="Word wrap"><i data-lucide="wrap-text" width="14"></i></button>
+          <span class="tsep"></span>
+          <button class="tbtn sq" id="ocopy" aria-label="Copy output" title="Copy output"><i data-lucide="copy" width="14"></i></button>
+          <button class="tbtn sq sec" id="odl" aria-label="Save output" title="Save output as .txt"><i data-lucide="download" width="14"></i></button>
+          <button class="tbtn sq" id="oclear" aria-label="Clear output" title="Clear (Ctrl+L)"><i data-lucide="eraser" width="14"></i></button>
+          <button class="tbtn sq" id="omax" aria-label="Maximize output" title="Maximize (double-click the bar)"><i data-lucide="maximize-2" width="14"></i></button>
+          <button class="tbtn sq" id="oclose" aria-label="Close output" title="Close (Esc)"><i data-lucide="x" width="14"></i></button>
+        </div>
+      </div>
+      <div class="rbar" id="rbar"><span class="rlang" id="rlang"></span><code id="rcmd"></code><span class="rrun" id="rrun"></span></div>
+      <div class="split"><div class="sti" id="sti"><label for="stdin">Input (optional)</label><textarea id="stdin" spellcheck="false"></textarea></div>
+      <div class="obody" id="obody" role="log" aria-live="polite" aria-label="Program output"></div>
+      <div class="oprob" id="oprob" role="tabpanel" aria-label="Problems" hidden></div></div>
     </div>
   </section>
 
@@ -548,7 +615,7 @@ tools.addEventListener('click',async e=>{
 document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{if(b.disabled)return;await copy($(b.dataset.copy).textContent);flash(b);toast('Copied to clipboard')});
 $('newBtn').onclick=()=>{box.classList.remove('full');if(!cur&&$('ta')){editing=null;seed='';showEditor();return}editing=null;nav('new')};
 const MOD=/Mac|iPhone|iPad/.test(navigator.userAgent)?'⌘':'Ctrl';
-const SC=[['N','Create new snippet'],['C','Copy code'],['L','Copy link'],['D','Download'],['R','Run code (30+ languages)'],['F9','Run code, even while typing'],['Mod + Shift + Enter','Run code, even while typing'],['S','Share snippet'],['Mod + Shift + F','Find in code'],['Alt + Shift + F','Format code (while typing too)'],['K','Fork snippet (edit a copy)'],['E','Edit your snippet'],['F','Fullscreen'],['T','Switch light / dark'],['Mod + Enter','Publish / save changes'],['Mod + S','Publish / save changes'],['Esc','Close / exit fullscreen'],['?','Show this list']];
+const SC=[['N','Create new snippet'],['C','Copy code'],['L','Copy link'],['D','Download'],['R','Run code (30+ languages)'],['F9','Run code, even while typing'],['Mod + Shift + Enter','Run code, even while typing'],['S','Share snippet'],['Mod + Shift + F','Find in code'],['Ctrl + C','Stop the running program (terminal)'],['Ctrl + `','Show / hide the terminal'],['Ctrl + L','Clear the terminal (when typing in it)'],['↑ / ↓','Previous / next input (terminal)'],['Alt + Shift + F','Format code (while typing too)'],['K','Fork snippet (edit a copy)'],['E','Edit your snippet'],['F','Fullscreen'],['T','Switch light / dark'],['Mod + Enter','Publish / save changes'],['Mod + S','Publish / save changes'],['Esc','Close / exit fullscreen'],['?','Show this list']];
 function toggleHelp(){
   const ex=document.querySelector('.kbwrap');if(ex){ex.remove();return}
   const w=document.createElement('div');w.className='kbwrap';
@@ -570,6 +637,8 @@ document.addEventListener('keydown',e=>{
   }
   if(cx)return;
   const mod=e.metaKey||e.ctrlKey;
+  if(e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key.toLowerCase()==='c'&&e.target.id!=='ta'&&!String(getSelection())&&!(e.target.selectionStart!=null&&e.target.selectionStart!==e.target.selectionEnd)){if(ctrlC())e.preventDefault()}
+  if(e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key==='`'){e.preventDefault();const o=$('out');o.hidden=!o.hidden;if(!o.hidden&&!$('obody').children.length)sysLine('Terminal ready. Press Run (F9).');return}
   if(mod&&e.shiftKey&&!e.altKey&&e.code==='KeyF'){e.preventDefault();openSearch();return}
   if(e.altKey&&e.shiftKey&&e.code==='KeyF'){e.preventDefault();formatNow();return}
   if(e.key==='F9'||(mod&&e.shiftKey&&e.key==='Enter')){e.preventDefault();if($('lsel'))runCode();return}
@@ -667,7 +736,7 @@ async function formatNow(){
   }catch(e){toast("Can't format: "+String(e.message||e).split('\n')[0].slice(0,80))}
 }
 /* ---------- error lines + find ---------- */
-const ERX=[[/([\w.\/-]+\.\w{1,6}):(\d+)(?::\d+)?/,2],[/[\w.\/-]+\.cs\((\d+),\d+\)/,1],[/File "([^"\/]+)", line (\d+)/,2],[/\bline (\d+)/i,1]];
+const ERX=[[/([\w.\/-]+\.\w{1,6}):(\d+)(?::\d+)?/,2],[/[\w.\/-]+\.cs\((\d+),\d+\)/,1],[/File "((?:(?!\/(?:usr|lib|opt)\/|site-packages|_pyodide)[^"])+)", line (\d+)/,2],[/\bline (\d+)/i,1]];
 function linkErrs(text,max){
   return text.split('\n').map(l=>{
     for(const [rx,g] of ERX){const m=rx.exec(l);if(!m)continue;
@@ -678,9 +747,9 @@ function linkErrs(text,max){
 const clearErr=()=>document.querySelectorAll('.eg').forEach(x=>x.classList.remove('eg'));
 const lineEl=L=>{const g=$('gut');return g?g.children[L]:ed.children[L]};
 function scrollToLine(L){const el=lineEl(L);if(!el)return;const r=el.getBoundingClientRect(),er=ed.getBoundingClientRect();ed.scrollTop+=r.top-er.top-ed.clientHeight/2+15}
-function goLine(n){
+function goLine(n,keep){
   const L=n-1,ta=$('ta'),el=lineEl(L);if(!el)return;
-  clearErr();el.classList.add('eg');scrollToLine(L);
+  if(!keep)clearErr();el.classList.add('eg');scrollToLine(L);
   if(ta){const ls=ta.value.split('\n');let a=0;for(let i=0;i<L;i++)a+=ls[i].length+1;ta.focus({preventScroll:true});ta.setSelectionRange(a,a+(ls[L]||'').length)}
 }
 const SR={on:false,cs:false,q:'',m:[],i:-1};
@@ -848,6 +917,176 @@ const dec=s=>s?new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(
 const needsInput=c=>/\binput\s*\(|\bscanf|\bcin\s*>>|\bgetline|\bScanner\b|readline|\bgets|\bfgets|ReadLine|System\.in|\bgetchar|^\s*read\s/m.test(c);
 const WB={C:'C','C++':'C++',Java:'Java',Python:'Python',Ruby:'Ruby',Go:'Go',Rust:'Rust',Haskell:'Haskell',Lua:'Lua',Perl:'Perl',PHP:'PHP',Swift:'Swift','C#':'C#',D:'D',Elixir:'Elixir',Erlang:'Erlang',OCaml:'OCaml',Pascal:'Pascal',Scala:'Scala',Groovy:'Groovy',Lisp:'Lisp',TypeScript:'TypeScript',Shell:'Bash script',SQL:'SQL'};
 let wbList=null;
+/* ---------- IDE terminal: ANSI colours, status chip, tabs, problems, controls ---------- */
+const ANSIRX=/\x1b\[[0-9;?]*[ -\/]*[@-~]/g;
+const AP=['#000000','#cd3131','#0dbc79','#e5e510','#2472c8','#bc3fbc','#11a8cd','#e5e5e5','#666666','#f14c4c','#23d18b','#f5f543','#3b8eea','#d670d6','#29b8db','#ffffff'];
+function a256(n){if(n<16)return AP[n];if(n<232){n-=16;const v=x=>x?55+x*40:0;return `rgb(${v(n/36|0)},${v((n%36)/6|0)},${v(n%6)})`}const g=8+(n-232)*10;return `rgb(${g},${g},${g})`}
+function ansiFrag(txt){
+  const f=document.createDocumentFragment();
+  txt=txt.split('\n').map(l=>{l=l.replace(/\r+$/,'');return l.includes('\r')?l.slice(l.lastIndexOf('\r')+1):l}).join('\n');
+  let st={},last=0,m;const rx=/\x1b\[([0-9;]*)m|\x1b\[[0-9;?]*[ -\/]*[@-~]|\x1b/g;
+  const out=t=>{if(!t)return;if(!Object.keys(st).length){f.appendChild(document.createTextNode(t));return}
+    const sp=document.createElement('span'),x=st;if(x.fg)sp.style.color=x.fg;if(x.bg)sp.style.background=x.bg;if(x.b)sp.style.fontWeight='700';if(x.d)sp.style.opacity='.65';if(x.i)sp.style.fontStyle='italic';if(x.u)sp.style.textDecoration='underline';sp.textContent=t;f.appendChild(sp)};
+  while((m=rx.exec(txt))){
+    out(txt.slice(last,m.index));last=rx.lastIndex;
+    if(m[1]===undefined)continue;
+    const c=m[1]===''?[0]:m[1].split(';').map(Number);st={...st};
+    for(let k=0;k<c.length;k++){const n=c[k];
+      if(n===0)st={};else if(n===1)st.b=1;else if(n===2)st.d=1;else if(n===3)st.i=1;else if(n===4)st.u=1;
+      else if(n===22){delete st.b;delete st.d}else if(n===23)delete st.i;else if(n===24)delete st.u;
+      else if(n>=30&&n<=37)st.fg=AP[n-30];else if(n>=90&&n<=97)st.fg=AP[n-82];else if(n===39)delete st.fg;
+      else if(n>=40&&n<=47)st.bg=AP[n-40];else if(n>=100&&n<=107)st.bg=AP[n-92];else if(n===49)delete st.bg;
+      else if(n===38||n===48){const key=n===38?'fg':'bg';if(c[k+1]===5){st[key]=a256(c[k+2]|0);k+=2}else if(c[k+1]===2){st[key]=`rgb(${c[k+2]|0},${c[k+3]|0},${c[k+4]|0})`;k+=4}}
+    }
+  }
+  out(txt.slice(last));return f;
+}
+const CMD={C:'gcc main.c -o main && ./main','C++':'g++ main.cpp -o main && ./main','C#':'mcs Main.cs && mono Main.exe',Java:'javac Main.java && java Main',Python:'python3 main.py',JavaScript:'node main.js',Go:'go run main.go',Rust:'rustc main.rs && ./main',Ruby:'ruby main.rb',PHP:'php main.php',Kotlin:'kotlinc Main.kt && kotlin MainKt',Swift:'swiftc main.swift && ./main',Lua:'lua main.lua',Perl:'perl main.pl',R:'Rscript main.R',Haskell:'ghc Main.hs && ./Main',TypeScript:'tsc main.ts && node main.js',Shell:'bash main.sh',SQL:'sqlite3 < main.sql',HTML:'open index.html'};
+function setRunBar(lang){
+  $('rlang').textContent=lang;$('rcmd').textContent=CMD[lang]||('run '+lang.toLowerCase());
+  $('rrun').textContent=lang==='JavaScript'||lang==='HTML'?'Browser':'';
+}
+const setRunner=n=>{$('rrun').textContent=n};
+const ST=$('ostat');
+function stState(){
+  const t=ST.textContent;
+  ST.dataset.state=/^(Running|Loading|Switching)/.test(t)?'running':/^Waiting/.test(t)?'waiting':/^Stopped/.test(t)?'stopped':/Accepted|Finished/.test(t)?'ok':/Error|Failed|Wrong|Runtime|Signal/i.test(t)?'err':'';
+  $('ostop').hidden=!(ST.dataset.state==='running'||ST.dataset.state==='waiting');
+}
+new MutationObserver(stState).observe(ST,{childList:true,characterData:true,subtree:true});
+function showTab(t){
+  const P=t==='p';$('otabT').classList.toggle('on',!P);$('otabP').classList.toggle('on',P);
+  $('otabT').setAttribute('aria-selected',String(!P));$('otabP').setAttribute('aria-selected',String(P));
+  $('obody').hidden=P;$('oprob').hidden=!P;
+}
+$('otabT').onclick=()=>showTab('t');$('otabP').onclick=()=>showTab('p');
+let PROBS=[],ranOnce=false;
+function parseProblems(raw,lang){
+  const t=raw.replace(ANSIRX,'').replace(/[\u2018\u2019\u00b4`]/g,"'"),code=($('ta')&&$('ta').value)||(cur&&cur.code)||'',max=code.split('\n').length,out=[],seen=new Set();
+  const push=(sev,ln,col,msg)=>{ln-=RUNOFF;if(!(ln>=1&&ln<=max))return;const k=sev+ln+':'+col+msg;if(seen.has(k))return;seen.add(k);out.push({sev,ln,col,msg:msg.trim()})};
+  for(const l of t.split('\n')){
+    let m=/^(?:.*[\\\/])?([\w.+-]+\.\w{1,6}):(\d+):(?:(\d+):)?\s*(fatal error|error|warning):\s*(.+)$/.exec(l);
+    if(m&&!/\.(h|hpp|hh|hxx|tcc)$/i.test(m[1])){push(m[4]==='warning'?'warning':'error',+m[2],+(m[3]||0),m[5]);continue}
+    m=/^(?:.*[\\\/])?([\w.+-]+\.cs)\((\d+),(\d+)\):\s*(error|warning)\s*([^:]*:\s*)?(.+)$/.exec(l);
+    if(m)push(m[4],+m[2],+m[3],m[6]);
+  }
+  const fr=[...t.matchAll(/File "((?:(?!\/(?:usr|lib|opt)\/|site-packages|_pyodide)[^"])+)", line (\d+)/g)];
+  if(fr.length){const ex=[...t.matchAll(/^(\w*(?:Error|Exception|Exit|Interrupt)\b.*)$/gm)].pop();if(ex)push('error',+fr[fr.length-1][2],0,ex[1])}
+  const jv=/^(Exception in thread.*|\S*Exception.*)$/m.exec(t),at=/\((\w+\.java):(\d+)\)/.exec(t);
+  if(lang==='Java'&&jv&&at)push('error',+at[2],0,jv[1]);
+  return out;
+}
+function renderProblems(){
+  PROBS=parseProblems(errAcc,RUNLANG);
+  const b=$('pbadge'),n=PROBS.length;b.hidden=!n;b.textContent=n;b.classList.toggle('warn',!PROBS.some(p=>p.sev==='error'));
+  const box=$('oprob');box.innerHTML='';
+  if(!n){const d=document.createElement('div');d.className='pempty';d.textContent=ranOnce?'No problems detected.':'Run your code to see problems here.';box.appendChild(d)}
+  for(const p of PROBS){
+    const r=document.createElement('div');r.className='prow '+p.sev;r.tabIndex=0;r.dataset.ln=p.ln;
+    r.innerHTML='<span class="pi">'+(p.sev==='error'?'\u2716':'\u26A0')+'</span><span class="pm"></span><span class="pl"></span>';
+    r.children[1].textContent=p.msg;r.children[2].textContent='Ln '+p.ln+(p.col?', Col '+p.col:'');box.appendChild(r);
+  }
+  clearErr();PROBS.forEach(p=>{if(p.sev==='error'){const el=lineEl(p.ln-1);if(el)el.classList.add('eg')}});
+}
+$('oprob').addEventListener('click',e=>{const r=e.target.closest('.prow');if(r)goLine(+r.dataset.ln,true)});
+$('oprob').addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('.prow');if(r&&e.key==='Enter')goLine(+r.dataset.ln,true)});
+let TFS=13,WRAP=true;
+try{TFS=Math.min(22,Math.max(10,+localStorage.getItem('dp_tfs')||13));WRAP=localStorage.getItem('dp_wrap')!=='0'}catch(e){}
+function termPrefs(){const b=$('obody');b.style.setProperty('--tfs',TFS+'px');b.classList.toggle('nowrap',!WRAP);$('owrap').classList.toggle('on',WRAP);try{localStorage.setItem('dp_tfs',TFS);localStorage.setItem('dp_wrap',WRAP?'1':'0')}catch(e){}}
+$('ofm').onclick=()=>{TFS=Math.max(10,TFS-1);termPrefs()};$('ofp').onclick=()=>{TFS=Math.min(22,TFS+1);termPrefs()};$('owrap').onclick=()=>{WRAP=!WRAP;termPrefs()};termPrefs();
+$('odl').onclick=()=>{const u=URL.createObjectURL(new Blob([$('obody').innerText],{type:'text/plain'})),a=document.createElement('a');a.href=u;a.download='output.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);toast('Saved output.txt')};
+$('tbar').addEventListener('dblclick',e=>{if(!e.target.closest('button'))$('omax').click()});
+/* ---------- friendly error hints (rule based, no AI) ---------- */
+const CC=['C','C++'],PYL=['Python'],JVL=['Java'],JSL=['JavaScript'];
+const HINTS=[
+[CC,/expected (?:',' or )?';'/,'Missing semicolon `;`. Add it at the end of the line shown, or the line just above it.','সেমিকোলন `;` বাদ পড়েছে। দেখানো লাইনের (বা ঠিক আগের লাইনের) শেষে `;` দিন।'],
+[CC,/'(cout|cin|endl|cerr)' was not declared|undeclared identifier '(cout|cin|endl|cerr)'|'(cout|cin|endl|cerr)' does not name a type|'(cout|cin|endl|cerr)' is not a member of 'std'/,'`$x` needs `#include <iostream>` and `using namespace std;` (or write `std::$x`).','`$x` ব্যবহার করতে `#include <iostream>` এবং `using namespace std;` লাগবে (অথবা `std::$x` লিখুন)।'],
+[CC,/'(string|vector|map|set|queue|stack|pair)' was not declared|undeclared identifier '(string|vector|map|set|queue|stack|pair)'|'(string|vector|map|set|queue|stack|pair)' does not name a type|no type named '(string|vector)'|'(string|vector|map|set|queue|stack|pair)' is not a member of 'std'/,'`$x` needs its header, for example `#include <$x>`, plus `using namespace std;` (or write `std::$x`).','`$x` ব্যবহার করতে তার হেডার দিন, যেমন `#include <$x>`, এবং `using namespace std;` লিখুন (অথবা `std::$x`)।'],
+[CC,/'([\w:]+)' was not declared in this scope|use of undeclared identifier '([\w:]+)'|'([\w:]+)' undeclared \(first use/,'`$x` is used before it is declared. Check the spelling (capital/small letters), declare it first, or add the missing `#include`.','`$x` declare করার আগেই ব্যবহার হয়েছে। বানান ও ছোট-বড় হাতের অক্ষর মিলিয়ে দেখুন, আগে declare করুন, অথবা দরকারি `#include` দিন।'],
+[CC,/undefined reference to 'main'/,'There is no `main()` function. A C/C++ program must contain `int main() { ... }`.','`main()` ফাংশন নেই। C/C++ প্রোগ্রামে `int main() { ... }` থাকতেই হবে।'],
+[CC,/undefined reference to '(?!main')([^'(]+)/,'`$x` is declared but its body (definition) is missing. Check that the function name and parameters match.','`$x` ফাংশনের declaration আছে কিন্তু আসল কোড (definition) নেই। ফাংশনের নাম ও প্যারামিটার মিলিয়ে দেখুন।'],
+[CC,/fatal error: .*No such file or directory/,'Header file not found. Check the spelling, for example `<iostream>`. `bits/stdc++.h` works only with GCC.','হেডার ফাইল পাওয়া যায়নি। বানান দেখুন, যেমন `<iostream>`। `bits/stdc++.h` শুধু GCC-তে চলে।'],
+[CC,/expected '}' at end of input|expected declaration before '}' token|expected unqualified-id before '}' token|extraneous closing brace/,'A `{` is not closed (or there is an extra `}`). Count your braces. Format with Alt+Shift+F to spot it by indentation.','একটি `{` বন্ধ করা হয়নি (বা বাড়তি `}` আছে)। `{ }` গুনে দেখুন। Alt+Shift+F দিয়ে ফরম্যাট করলে ইনডেন্টেশনে ভুল ধরা পড়বে।'],
+[CC,/expected '\)'/,'Missing closing parenthesis `)`. Count your `(` and `)`.','বন্ধনী `)` বাদ পড়েছে। `(` আর `)` এর সংখ্যা মিলিয়ে দেখুন।'],
+[CC,/expected primary-expression/,'Something is missing or extra before this point, such as a value, an operator or a symbol. Look at the line closely.','এই জায়গার আগে কিছু বাদ পড়েছে বা বাড়তি আছে, যেমন মান, অপারেটর বা চিহ্ন। লাইনটি ভালো করে দেখুন।'],
+[CC,/invalid conversion from|cannot convert|no viable conversion/,'The types do not match, for example text given to an `int`. Check the variable types.','টাইপ মিলছে না, যেমন `int`-এ টেক্সট দেওয়া হয়েছে। ভেরিয়েবলের টাইপ দেখুন।'],
+[CC,/no match for 'operator(?:>>|<<)'|invalid operands to binary expression|invalid operands of types/,'`cin` uses `>>` and `cout` uses `<<`. You also get this when the type cannot be read or printed directly.','`cin` এর সাথে `>>` এবং `cout` এর সাথে `<<` ব্যবহার করতে হয়। টাইপ সরাসরি পড়া/ছাপা না গেলেও এই এরর আসে।'],
+[CC,/redefinition of|conflicting declaration|redeclaration of/,'The same name is defined twice in the same place. Rename one or remove the duplicate.','একই নাম একই জায়গায় দুইবার তৈরি হয়েছে। নাম বদলান বা একটি মুছুন।'],
+[CC,/control reaches end of non-void function|non-void function does not return a value/,'A function that should return a value can reach its end without `return`. Add `return ...;`.','যে ফাংশনের মান ফেরত দেওয়ার কথা সেটি `return` ছাড়াই শেষ হতে পারে। `return ...;` যোগ করুন।'],
+[CC,/'([\w:]+)' does not name a type|unknown type name '([\w:]+)'/,'`$x` is not a known type. Check the spelling, and whether an `#include` or `using namespace std;` is missing.','`$x` টাইপ চেনা যাচ্ছে না। বানান দেখুন, নয়তো `#include` বা `using namespace std;` বাদ পড়েছে।'],
+[CC,/no matching function for call to|too many arguments to function|too few arguments to function|no matching constructor/,'The function was called with the wrong number or type of arguments. Compare with its definition.','ফাংশনে ভুল সংখ্যক বা ভুল টাইপের আর্গুমেন্ট দেওয়া হয়েছে। ফাংশনের definition-এর সাথে মিলিয়ে দেখুন।'],
+[CC,/SIGABRT|terminate called after throwing|bad_alloc|out_of_range/,'The program was aborted because of an exception, for example a vector index out of range or `stoi` on bad text. Read the red error.','কোথাও exception এসে প্রোগ্রাম থেমেছে, যেমন vector-এর বাইরের index বা `stoi`-এ ভুল টেক্সট। লাল এররটি পড়ুন।'],
+[null,/SIGSEGV|Segmentation fault/,'The program touched invalid memory. Common causes: array index out of range, an uninitialized or null pointer, or recursion that never stops.','প্রোগ্রাম ভুল মেমোরি ছুঁয়েছে। সাধারণ কারণ: অ্যারের বাইরের index, null/অ-initialized পয়েন্টার, বা থামে না এমন recursion।'],
+[null,/SIGFPE|Floating point exception/,'Division by zero. Check that the divisor is not 0 before dividing.','শূন্য দিয়ে ভাগ হয়েছে। ভাগ করার আগে divisor 0 কিনা দেখে নিন।'],
+[PYL,/IndentationError: expected an indented block/,'After a line ending with `:` the next line must be indented (4 spaces).','`:` দিয়ে শেষ হওয়া লাইনের পরের লাইন ইনডেন্ট (৪ স্পেস ভিতরে) করতে হবে।'],
+[PYL,/IndentationError: (?:unexpected indent|unindent does not match)/,'The indentation is inconsistent. Use the same number of spaces everywhere and do not mix tabs and spaces.','ইনডেন্টেশন এলোমেলো। সব জায়গায় একই সংখ্যক স্পেস দিন, ট্যাব আর স্পেস মেশাবেন না।'],
+[PYL,/SyntaxError: (?:unterminated string literal|EOL while scanning string literal)/,'A string is missing its closing quote (`"` or `\'`).','স্ট্রিং-এর শেষের কোটেশন (`"` বা `\'`) বন্ধ করা হয়নি।'],
+[PYL,/SyntaxError: .*was never closed|unexpected EOF while parsing/,'A `(`, `[` or `{` was never closed.','একটি `(`, `[` বা `{` বন্ধ করা হয়নি।'],
+[PYL,/SyntaxError: expected ':'/,'Lines starting with `if`, `for`, `while`, `def` or `class` must end with `:`.','`if`, `for`, `while`, `def`, `class` লাইনের শেষে `:` দিতে হয়।'],
+[PYL,/SyntaxError: invalid syntax/,'Python cannot understand this line. Check this line and the one above it: a missing `:`, an unclosed bracket or quote, or a typo.','Python লাইনটি বুঝতে পারছে না। এই লাইন ও আগের লাইনে `:` বাদ পড়েছে কিনা, বন্ধনী/কোটেশন খোলা আছে কিনা, বা বানান ভুল আছে কিনা দেখুন।'],
+[PYL,/NameError: name '([^']+)' is not defined/,'`$x` is used before it is created, or misspelled. Capital and small letters matter.','`$x` তৈরি হওয়ার আগে ব্যবহার হয়েছে বা বানান ভুল। ছোট-বড় হাতের অক্ষরও মিলিয়ে দেখুন।'],
+[PYL,/TypeError: can only concatenate str|TypeError: unsupported operand type/,'You cannot add text and numbers directly. Convert with `int()` or `str()`.','টেক্সট আর সংখ্যা সরাসরি যোগ করা যায় না। `int()` বা `str()` দিয়ে টাইপ বদলে নিন।'],
+[PYL,/ValueError: invalid literal for int\(\)/,'That text cannot become an int. Check the input for letters or extra spaces. Remember `input()` always gives text.','টেক্সটটিকে সংখ্যায় বদলানো যায়নি। ইনপুটে অক্ষর বা বাড়তি স্পেস আছে কিনা দেখুন। মনে রাখবেন `input()` সবসময় টেক্সট দেয়।'],
+[PYL,/ZeroDivisionError/,'Division by zero.','শূন্য দিয়ে ভাগ করা হয়েছে।'],
+[PYL,/IndexError: (?:list|string|tuple) index out of range/,'The index is outside the list. Indexes start at 0 and end at `len(list) - 1`.','লিস্টের বাইরের index নেওয়া হয়েছে। index শুরু হয় ০ থেকে, শেষ হয় `len(list) - 1` এ।'],
+[PYL,/KeyError: (.+)/,'The dictionary has no key $x. Check the spelling, or test with `in` first.','ডিকশনারিতে $x নামের key নেই। বানান দেখুন বা আগে `in` দিয়ে যাচাই করুন।'],
+[PYL,/ModuleNotFoundError: No module named '([^']+)'/,'The module `$x` is not available on this runner (only the standard library). Libraries such as numpy may work only in browser mode.','`$x` মডিউল এই রানারে নেই (শুধু standard library চলে)। numpy-র মতো লাইব্রেরি কেবল ব্রাউজার মোডে চলতে পারে।'],
+[PYL,/EOFError/,'`input()` asked for more input than was given.','`input()` যতটা ইনপুট চেয়েছিল তার চেয়ে কম দেওয়া হয়েছে।'],
+[PYL,/AttributeError: .* has no attribute '([^']+)'/,'This object has no method or attribute `$x`. Check the spelling and the type.','এই অবজেক্টে `$x` নামের মেথড/অ্যাট্রিবিউট নেই। বানান ও টাইপ দেখুন।'],
+[PYL,/TypeError: .*(?:positional argument|takes \d+)/,'The function was called with the wrong number of arguments.','ফাংশনে ভুল সংখ্যক আর্গুমেন্ট দেওয়া হয়েছে।'],
+[PYL,/RecursionError/,'The function keeps calling itself. Make sure it has a stopping condition (base case).','ফাংশন নিজেকে ডাকতেই থাকছে। recursion-এ থামার শর্ত (base case) আছে কিনা দেখুন।'],
+[JVL,/error: ';' expected/,'Missing semicolon `;` at the end of the line shown.','দেখানো লাইনের শেষে সেমিকোলন `;` বাদ পড়েছে।'],
+[JVL,/class (\w+) is public, should be declared in a file named/,'On this runner the public class must be named `Main`.','এই রানারে public ক্লাসের নাম `Main` হতে হবে।'],
+[JVL,/cannot find symbol/,'A name is not recognised: a typo, a missing `import`, or it was never declared.','নামটি চেনা যাচ্ছে না: বানান ভুল, `import` বাদ, বা declare করা হয়নি।'],
+[JVL,/incompatible types/,'The types do not match, for example a `double` or `String` given to an `int`. Fix the type or cast.','টাইপ মিলছে না, যেমন `int`-এ `double` বা `String`। টাইপ ঠিক করুন বা cast করুন।'],
+[JVL,/missing return statement/,'A `return` is missing. Every path of the method must return a value.','`return` বাদ পড়েছে। মেথডের সব পথে মান ফেরত দিতে হবে।'],
+[JVL,/reached end of file while parsing|class, interface, or enum expected/,'A `}` is missing or there is an extra one. Count your braces.','`}` বাদ পড়েছে বা বাড়তি আছে। `{ }` গুনে দেখুন।'],
+[JVL,/NoSuchElementException/,'`Scanner` wanted input but none was left. Type all input lines first, then press Enter on an empty line.','`Scanner` ইনপুট চেয়েছে কিন্তু আর কিছু নেই। টার্মিনালে আগে সব ইনপুট লাইন লিখে খালি Enter দিন।'],
+[JVL,/InputMismatchException/,'Text was given where a number was expected.','সংখ্যার জায়গায় অন্য কিছু (টেক্সট) ইনপুট দেওয়া হয়েছে।'],
+[JVL,/IndexOutOfBoundsException/,'An index outside the array or string. Indexes start at 0 and end at `length - 1`.','অ্যারে/স্ট্রিং-এর বাইরের index। index শুরু ০ থেকে, শেষ `length - 1`।'],
+[JVL,/NullPointerException/,'A method was called on `null`. Check that the variable was given a value first.','`null` অবজেক্টে মেথড চালানো হয়েছে। ভেরিয়েবলে আগে মান বসানো হয়েছে কিনা দেখুন।'],
+[JVL,/might not have been initialized/,'The variable is used before it was given a value.','ভেরিয়েবলে ব্যবহারের আগে কোনো মান দেওয়া হয়নি।'],
+[JVL,/ArithmeticException: \/ by zero/,'Division by zero.','শূন্য দিয়ে ভাগ।'],
+[JSL,/ReferenceError: (\w+) is not defined/,'`$x` is used before it is declared, or misspelled.','`$x` declare করার আগে ব্যবহার হয়েছে বা বানান ভুল।'],
+[JSL,/SyntaxError: (?:Unexpected token|Unexpected identifier|missing \))/,'A symbol is out of place or missing, such as a bracket, comma or quote. Check this line and the one above.','কোনো চিহ্ন (বন্ধনী, কমা, কোটেশন) ভুল জায়গায় বা বাদ পড়েছে। এই লাইন ও আগের লাইন দেখুন।'],
+[JSL,/TypeError: Cannot read propert(?:y|ies) of (?:undefined|null)/,'You are using a property of something that is `undefined` or `null`. Check that the variable has a value.','`undefined` বা `null` এর প্রপার্টি ব্যবহার করা হয়েছে। ভেরিয়েবলে মান আছে কিনা দেখুন।'],
+[JSL,/TypeError: (\w+) is not a function/,'`$x` is not a function. Check the spelling and what the variable holds.','`$x` ফাংশন নয়। বানান ও ভেরিয়েবলে কী আছে দেখুন।'],
+[JSL,/Assignment to constant variable/,'A `const` variable cannot be changed. Use `let` instead.','`const` ভেরিয়েবলের মান বদলানো যায় না। `let` ব্যবহার করুন।'],
+];
+let HL=(()=>{try{const v=localStorage.getItem('dp_hint');if(v)return v}catch(e){}return /^bn/i.test(navigator.language||'')?'bn':'en'})();
+let errAcc='',ht=null,RUNLANG='';
+function hintsFor(raw,lang){
+  const t=raw.replace(/[\u2018\u2019\u00b4`]/g,"'"),out=[];
+  for(const [ls,rx,en,bn] of HINTS){
+    if(ls&&!ls.includes(lang))continue;const m=rx.exec(t);if(!m)continue;
+    const r=(HL==='bn'?bn:en).replace(/\$x/g,m.slice(1).find(Boolean)||'');
+    if(!out.includes(r))out.push(r);if(out.length>=3)break;
+  }
+  return out;
+}
+function renderHints(){
+  renderProblems();
+  const b=$('obody');if(!b)return;const old=b.querySelector('.hint');if(old)old.remove();
+  const h=hintsFor(errAcc,RUNLANG);if(!h.length)return;
+  const d=document.createElement('div');d.className='ol hint';d.textContent='💡 '+h.join('\n💡 ');
+  const t=b.querySelector('.tin'),row=t&&t.parentNode!==b?t.parentNode:null;
+  if(row)b.insertBefore(d,row);else b.appendChild(d);b.scrollTop=b.scrollHeight;
+}
+function noteErr(t){errAcc+=t+'\n';clearTimeout(ht);ht=setTimeout(renderHints,150)}
+const hintBtn=()=>{$('ohint').textContent=HL==='bn'?'বাং':'EN'};hintBtn();
+$('ohint').onclick=()=>{HL=HL==='bn'?'en':'bn';try{localStorage.setItem('dp_hint',HL)}catch(e){}hintBtn();renderHints()};
+const addExit=(add,code,time)=>add('exit '+(+code===0?'ok':'bad'),'[Process exited with code '+code+(time?' in '+(+time).toFixed(2)+'s':'')+']');
+/* terminal: input history (up/down) and Ctrl+C */
+const HIST=[];
+function sysLine(t){const d=document.createElement('div');d.className='ol sys';d.textContent=t;$('obody').appendChild(d)}
+function ctrlC(){
+  if($('out').hidden)return false;
+  const t=$('obody').querySelector('.tin'),busy=!!rc||pyBusy||/^Running/.test($('ostat').textContent);
+  if(!t&&!busy)return false;
+  stopRun();if(pw&&pyBusy){pw.terminate();pw=null;pyReady=false;pyBusy=false;clearTimeout(pt)}
+  if(t)t.replaceWith(document.createTextNode(t.value+'^C'));
+  sysLine('[Process stopped]');$('ostat').textContent='Stopped';return true;
+}
 /* ---------- interactive input (replay): the program asks, you answer inline ---------- */
 const MARK='@@DPNEED@@';
 const SHIM_C=`#ifndef _GNU_SOURCE
@@ -901,18 +1140,24 @@ _s.stdin=_DP()`;
 const shim=(code,lang)=>lang==='Python'?'exec('+JSON.stringify(PYSHIM)+')\n'+code:SHIM_C+code;
 let IL=[],keepIL=false,noShim=false,RUNOFF=0;
 const curStdin=()=>{const a=$('stdin').value||'';return a+(a&&!a.endsWith('\n')&&IL.length?'\n':'')+IL.map(x=>x+'\n').join('')};
-const WAITMSG='Waiting. Ctrl+D for end.';
+const WAITMSG='Waiting for input. Type in the terminal and press Enter (Ctrl+D = end of input)';
 function mkTin(onEnter,onEOF){
   const i=document.createElement('input');i.className='tin';i.type='text';i.autocomplete='off';i.spellcheck=false;i.autocapitalize='off';i.setAttribute('aria-label','Program input');
   const fit=()=>{i.style.width=Math.max(1,i.value.length+1)+'ch'};i.oninput=fit;fit();
+  let hi=HIST.length,draft='';
   i.onkeydown=ev=>{
-    if(ev.key==='Enter'){ev.preventDefault();onEnter(i)}
-    else if(onEOF&&ev.ctrlKey&&ev.key.toLowerCase()==='d'){ev.preventDefault();onEOF()}
+    const k=ev.key.toLowerCase();
+    if(ev.key==='Enter'){ev.preventDefault();if(i.value&&HIST[HIST.length-1]!==i.value){HIST.push(i.value);if(HIST.length>50)HIST.shift()}onEnter(i)}
+    else if(onEOF&&ev.ctrlKey&&k==='d'){ev.preventDefault();onEOF()}
+    else if(ev.ctrlKey&&!ev.metaKey&&k==='c'&&i.selectionStart===i.selectionEnd){ev.preventDefault();ctrlC()}
+    else if(ev.ctrlKey&&!ev.metaKey&&k==='l'){ev.preventDefault();[...$('obody').children].forEach(c=>{if(c!==i.parentNode)c.remove()})}
+    else if(ev.key==='ArrowUp'&&hi>0){ev.preventDefault();if(hi===HIST.length)draft=i.value;hi--;i.value=HIST[hi];fit();i.setSelectionRange(i.value.length,i.value.length)}
+    else if(ev.key==='ArrowDown'&&hi<HIST.length){ev.preventDefault();hi++;i.value=hi===HIST.length?draft:HIST[hi];fit();i.setSelectionRange(i.value.length,i.value.length)}
   };
   return i;
 }
 function addPrompt(o){
-  const b=$('obody'),d=document.createElement('div');d.className='ol log';d.textContent=o;
+  const b=$('obody'),d=document.createElement('div');d.className='ol log';if(/[\x1b\r]/.test(o))d.appendChild(ansiFrag(o));else d.textContent=o;
   const i=mkTin(x=>{IL.push(x.value);keepIL=true;runCode()},()=>{noShim=true;keepIL=true;runCode()});
   d.appendChild(i);b.appendChild(d);i.focus();b.scrollTop=b.scrollHeight;
 }
@@ -936,12 +1181,14 @@ function emitRes(add,o,e,c,m,inter){
 }
 const gfetch=(sg,u,o)=>fetch(u,o).then(r=>{if(sg.aborted)throw new Error('aborted');return r});
 async function runWandbox(code,lang,add,stat,sg,inter){
-  stat.textContent='Running on Wandbox…';
+  stat.textContent='Running on Wandbox…';setRunner('Wandbox');
   wbList=wbList||await (await gfetch(sg,'https://wandbox.org/api/list.json')).json();
   const c=wbList.find(x=>x.language===WB[lang]&&!/head/.test(x.name))||wbList.find(x=>x.language===WB[lang]);
   if(!c)throw new Error('no compiler');
   const r=await (await gfetch(sg,'https://wandbox.org/api/compile.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({compiler:c.name,code,stdin:curStdin()})})).json();
+  if(sg.aborted)throw new Error('aborted');
   const need=emitRes(add,r.program_output||'',r.program_error||'',r.compiler_error||'','',inter);
+  if(!need&&(r.program_output||r.program_error||r.status==='0'))addExit(add,r.status||0,null);
   stat.textContent=need?WAITMSG:'Finished on Wandbox'+(r.status&&r.status!=='0'?' · exit '+r.status:'');
 }
 /* Python runs in the browser (Pyodide in a Worker): no server, no rate limit. Falls back to the server runners if it can't start. */
@@ -952,7 +1199,7 @@ if(e.data.warm)return;
 try{const L=e.data.stdin.split('\\n');let i=0;
 py.setStdout({batched:s=>postMessage({t:'log',a:s})});py.setStderr({batched:s=>postMessage({t:'error',a:s})});py.setStdin({stdin:()=>i<L.length?L[i++]:undefined});
 try{await py.loadPackagesFromImports(e.data.code)}catch(_){}
-await py.runPythonAsync(e.data.code)}catch(err){postMessage({t:'error',a:String(err.message||err)})}postMessage({t:'done'})}`;
+await py.runPythonAsync(e.data.code)}catch(err){postMessage({t:'error',a:String(err.message||err),fatal:1})}postMessage({t:'done'})}`;
 let pw=null,pt=null,pyReady=false,pyBusy=false,pyBad=false;
 function warmPy(){
   if(pw||pyBad||saver())return;
@@ -961,17 +1208,17 @@ function warmPy(){
     pw.postMessage({warm:1,code:'',stdin:''})}catch(e){pw=null}
 }
 function runPy(code,add,stat){
-  let fin=false;
+  let fin=false,hadErr=false;
   const fb=()=>{if(fin)return;fin=true;pyBusy=false;clearTimeout(pt);if(pw){pw.terminate();pw=null}pyReady=false;stat.textContent='Switching to server…';runRemote(code,'Python',add,stat)};
   if(pw&&pyBusy){pw.terminate();pw=null;pyReady=false}
   try{if(!pw)pw=new Worker(URL.createObjectURL(new Blob([PYSRC],{type:'text/javascript'})))}catch(e){return fb()}
   const w=pw;pyBusy=true;
-  stat.textContent=pyReady?'Running…':'Loading Python (first run only)…';
+  stat.textContent=pyReady?'Running…':'Loading Python (first run only)…';setRunner('Browser (Pyodide)');
   w.onmessage=e=>{if(fin)return;const {t,a}=e.data;
     if(t==='ready'){pyReady=true;stat.textContent='Running…'}
     else if(t==='loadfail'){pyBad=true;fb()}
-    else if(t==='done'){fin=true;pyBusy=false;clearTimeout(pt);stat.textContent='Finished · Python (in browser)';if(!$('obody').children.length)add('sys','(no output)')}
-    else add(t,a)};
+    else if(t==='done'){fin=true;pyBusy=false;clearTimeout(pt);stat.textContent='Finished · Python (in browser)';if(!$('obody').children.length)add('sys','(no output)');addExit(add,hadErr?1:0,null)}
+    else{if(e.data.fatal)hadErr=true;add(t,a)}};
   w.onerror=fb;
   pt=setTimeout(()=>{if(fin)return;fin=true;pyBusy=false;if(pw){pw.terminate();pw=null}pyReady=false;add('error','Stopped: ran for more than 20 seconds');stat.textContent='Stopped'},20000);
   w.postMessage({code,stdin:$('stdin').value||''});
@@ -984,7 +1231,7 @@ async function runRemote(code,lang,add,stat,inter){
   const stop=()=>clearInterval(tick);
   const src=inter?shim(code,lang):code;RUNOFF=inter&&lang==='Python'?1:0;
   if(pref()==='w'&&WB[lang]){try{await runWandbox(src,lang,add,stat,sg,inter);stop();rc=null;return}catch(e0){if(sg.aborted){stop();return}setPref('j')}}
-  stat.textContent='Running on Judge0…';
+  stat.textContent='Running on Judge0…';setRunner('Judge0');
   if(lang==='Java'&&/public\s+class\s+(?!Main\b)\w+/.test(code))add('sys','Tip: this runner needs the public class to be named Main');
   try{
     const body=JSON.stringify({source_code:enc(src),language_id:id,stdin:enc(curStdin())}),post=w=>gfetch(sg,J0+'/submissions?base64_encoded=true&fields=*&wait='+w,{method:'POST',headers:{'Content-Type':'application/json'},body});
@@ -1003,7 +1250,10 @@ async function runRemote(code,lang,add,stat,inter){
     }
     if(!d||!d.status||d.status.id<=2)throw new Error('Runner took too long — try again');
     const o=dec(d.stdout),e=dec(d.stderr),c=dec(d.compile_output),m=dec(d.message);
+    if(sg.aborted)return;
     const need=emitRes(add,o,e,c,m,inter);
+    if(d.status.id>=7)noteErr(d.status.description);
+    if(!need&&d.status.id!==5&&d.status.id!==6&&d.status.id!==13)addExit(add,d.exit_code!=null?d.exit_code:(d.exit_signal?128+d.exit_signal:(d.status.id===3?0:1)),d.time);
     stat.textContent=need?WAITMSG:(d.status.id===5?'Stopped':d.status.description)+(d.time?' · '+Math.round(d.time*1000)+' ms':'')+(d.memory?' · '+(d.memory/1024).toFixed(1)+' MB':'');
   }catch(err){if(sg.aborted)return;
     if(WB[lang]){try{await runWandbox(src,lang,add,stat,sg,inter);setPref('w');rc=null;return}catch(e2){if(sg.aborted)return}}
@@ -1035,12 +1285,13 @@ self.onmessage=async e=>{
 `;
 let wk=null,wt=null;
 function stopRun(){if(rc){rc.abort();rc=null}if(wk){wk.terminate();wk=null}clearTimeout(wt)}
-function closeOut(){stopRun();const o=$('out');if(o){o.hidden=true;$('obody').innerHTML=''}}
+function closeOut(){stopRun();showTab('t');const o=$('out');if(o){o.hidden=true;$('obody').innerHTML=''}}
 function runCode(){
   const ta=$('ta'),code=ta?ta.value:cur&&cur.code,lang0=ta?detect(code):cur&&cur.lang,sv=$('lsel')&&$('lsel').value,lang=sv&&sv!=='auto'?sv:lang0;
   if(!code||!code.trim())return toast('Nothing to run');
   if(!RUNNABLE.includes(lang))return toast('Can\'t tell the language — pick one from the list next to Run');
   if(!keepIL)IL=[];keepIL=false;
+  setRunBar(lang);showTab('t');
   const remote=lang!=='JavaScript'&&lang!=='HTML';
   $('sti').hidden=!remote;
   const ns=noShim;noShim=false;
@@ -1048,7 +1299,7 @@ function runCode(){
   if(remote&&!inter&&!ns&&needsInput(code)&&!IL.length&&!gathered){stopRun();gatherInput();return}
   gathered=false;
   stopRun();
-  const body=$('obody'),stat=$('ostat');$('out').hidden=false;body.className='obody';body.innerHTML='';clearErr();
+  const body=$('obody'),stat=$('ostat');$('out').hidden=false;body.className='obody';body.innerHTML='';clearErr();RUNLANG=lang;errAcc='';clearTimeout(ht);ranOnce=true;renderProblems();
   if(lang==='HTML'){
     body.classList.add('pv');
     const f=document.createElement('iframe');f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups');f.title='Preview';f.srcdoc=code;body.appendChild(f);
@@ -1059,7 +1310,7 @@ function runCode(){
   const add=(cls,txt)=>{
     if(capped)return;n++;chars+=txt.length;
     if(n>500||chars>100000){capped=true;cls='sys';txt='… output truncated'}
-    const d=document.createElement('div');d.className='ol '+cls;if(cls==='error')d.innerHTML=linkErrs(txt,nl);else d.textContent=txt;body.appendChild(d);body.scrollTop=body.scrollHeight;
+    const d=document.createElement('div');d.className='ol '+cls;if(cls==='error'){txt=txt.replace(ANSIRX,'');d.innerHTML=linkErrs(txt,nl);noteErr(txt)}else if(/[\x1b\r]/.test(txt))d.appendChild(ansiFrag(txt));else d.textContent=txt;body.appendChild(d);body.scrollTop=body.scrollHeight;
   };
   stat.textContent='Running…';
   if(lang==='Python'&&!saver()&&!pyBad&&!inter){runPy(code,add,stat);return}
@@ -1080,6 +1331,7 @@ function runCode(){
 $('oclear').onclick=()=>{$('obody').innerHTML=''};
 $('oclose').onclick=closeOut;
 $('rerun').onclick=runCode;
+$('ostop').onclick=()=>ctrlC();
 $('stdin').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&!e.shiftKey){e.preventDefault();runCode()}});
 $('ocopy').onclick=async()=>{await copy($('obody').innerText);toast('Output copied')};
 $('omax').onclick=()=>{const m=$('out').classList.toggle('max');$('omax').innerHTML=`<i data-lucide="${m?'minimize-2':'maximize-2'}" width="14"></i>`;icons()};
